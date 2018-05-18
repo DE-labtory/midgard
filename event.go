@@ -4,7 +4,7 @@ import "time"
 
 //Providing default an Event
 type Event struct{
-	ID string
+	AggregateID string
 	Version int
 	Time time.Time
 	Type string
