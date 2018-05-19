@@ -18,4 +18,11 @@ func main() {
 	defer os.RemoveAll(path)
 
 	store.Save("1", User{})
+
+	_, err := store.Load("1")
+
+	if err != nil {
+		panic(err.Error())
+	}
+
 }

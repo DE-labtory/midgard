@@ -5,6 +5,8 @@ import (
 	"errors"
 	"sync"
 
+	"reflect"
+
 	"github.com/it-chain/eventsource"
 	"github.com/it-chain/eventsource/store"
 	"github.com/it-chain/leveldb-wrapper"
@@ -13,22 +15,25 @@ import (
 var ErrNilEvents = errors.New("no event history exist")
 var ErrGetValue = errors.New("fail to get value from leveldb")
 
-type History []eventsource.Event
+type SerializedEvent []byte
+type History []SerializedEvent
 
 //Leveldb store implementing store interface
 type Store struct {
-	mux *sync.RWMutex
-	db  *leveldbwrapper.DB
+	mux        *sync.RWMutex
+	db         *leveldbwrapper.DB
+	serializer EventSerializer
 }
 
-func NewEventStore(path string) store.EventStore {
+func NewEventStore(path string, serializer EventSerializer) store.EventStore {
 
 	db := leveldbwrapper.CreateNewDB(path)
 	db.Open()
 
 	return &Store{
-		db:  db,
-		mux: &sync.RWMutex{},
+		db:         db,
+		mux:        &sync.RWMutex{},
+		serializer: serializer,
 	}
 }
 
@@ -98,4 +103,16 @@ func (s Store) getHistory(aggregateID string) (*History, error) {
 	}
 
 	return history, nil
+}
+
+type EventSerializer interface {
+	// MarshalEvent converts an Event to a Record
+	Marshal(event eventsource.Event) (SerializedEvent, error)
+
+	// UnmarshalEvent converts an Event backed into a Record
+	Unmarshal(serializedEvent SerializedEvent) (eventsource.Event, error)
+}
+
+type JSONSerializer struct {
+	eventTypes map[string]reflect.Type
 }
