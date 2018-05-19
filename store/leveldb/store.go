@@ -3,13 +3,10 @@ package leveldb
 import (
 	"encoding/json"
 	"errors"
-	"sync"
-
-	"reflect"
-
 	"fmt"
-
+	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/it-chain/eventsource"
 	"github.com/it-chain/eventsource/store"
@@ -147,6 +144,7 @@ type JSONSerializer struct {
 }
 
 func NewSerializer(events ...eventsource.Event) EventSerializer {
+
 	s := &JSONSerializer{
 		eventTypes: make(map[string]reflect.Type),
 	}
