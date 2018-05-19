@@ -11,21 +11,21 @@ type Event interface {
 }
 
 //Providing default an Event implementation
-type EventD struct {
+type EventModel struct {
 	AggregateID string
 	Version     int
 	Time        time.Time
 	Type        string
 }
 
-func (e EventD) GetType() string {
+func (e EventModel) GetType() string {
 	return e.Type
 }
 
-func (e EventD) GetAggregateID() string {
+func (e EventModel) GetAggregateID() string {
 	return e.AggregateID
 }
 
-func (e EventD) GetVersion() int {
+func (e EventModel) GetVersion() int {
 	return e.Version
 }

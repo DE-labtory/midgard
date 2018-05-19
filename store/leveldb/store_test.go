@@ -5,10 +5,6 @@ import (
 
 	"time"
 
-	"reflect"
-
-	"fmt"
-
 	"os"
 
 	"github.com/it-chain/eventsource"
@@ -16,19 +12,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type UserAddedEvent struct {
+	Name string
+	eventsource.EventModel
+}
+
 func TestNew(t *testing.T) {
 
 	//given
 	path := "test"
-	store := leveldb.NewEventStore(path)
+	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserAddedEvent{}))
 	defer os.RemoveAll(path)
 
 	var aggregateID string
 
 	aggregateID = "1"
 
-	events := []eventsource.EventD{{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}, {AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}, {AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}}
-	events2 := []eventsource.EventD{{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}, {AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}}
+	events := []UserAddedEvent{
+		{Name: "jun", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun2", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun3", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+	}
+
+	events2 := []UserAddedEvent{
+		{Name: "jun", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
+		{Name: "jun2", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
+	}
 
 	//when
 	err := store.Save(aggregateID, ToEvent(events...)...)
@@ -38,7 +47,7 @@ func TestNew(t *testing.T) {
 	assert.NoError(t, err)
 
 	//then
-	assert.Equal(t, history, events)
+	assert.Equal(t, ToUserAddedEvent(t, history...), events)
 
 	//when
 	store.Save(aggregateID, ToEvent(events2...)...)
@@ -50,25 +59,25 @@ func TestNew(t *testing.T) {
 	assert.NoError(t, err)
 
 	//then
-	assert.Equal(t, totalEvents, history)
+	assert.Equal(t, ToUserAddedEvent(t, history...), totalEvents)
 }
 
-func TestNewEventStore(t *testing.T) {
-	var aggregateID string
-
-	aggregateID = "1"
-	events2 := []eventsource.EventD{{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}, {AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}}
-	v := reflect.ValueOf(events2)
-
-	fmt.Print(v)
-}
-
-//
-//Convert a slice or array of a specific type to array of interface{}
-func ToEvent(eventD ...eventsource.EventD) []eventsource.Event {
-	intf := make([]eventsource.Event, len(eventD))
-	for i, v := range eventD {
+////Convert a slice or array of a specific type to array of interface{}
+func ToEvent(event ...UserAddedEvent) []eventsource.Event {
+	intf := make([]eventsource.Event, len(event))
+	for i, v := range event {
 		intf[i] = eventsource.Event(v)
 	}
 	return intf
+}
+
+func ToUserAddedEvent(t *testing.T, events ...eventsource.Event) []UserAddedEvent {
+
+	uae := make([]UserAddedEvent, 0)
+	for _, v := range events {
+		userAddedEvent := v.(*UserAddedEvent)
+		uae = append(uae, *userAddedEvent)
+	}
+
+	return uae
 }

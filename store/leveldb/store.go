@@ -7,6 +7,10 @@ import (
 
 	"reflect"
 
+	"fmt"
+
+	"strings"
+
 	"github.com/it-chain/eventsource"
 	"github.com/it-chain/eventsource/store"
 	"github.com/it-chain/leveldb-wrapper"
@@ -15,7 +19,11 @@ import (
 var ErrNilEvents = errors.New("no event history exist")
 var ErrGetValue = errors.New("fail to get value from leveldb")
 
-type SerializedEvent []byte
+type SerializedEvent struct {
+	Type string
+	Data []byte
+}
+
 type History []SerializedEvent
 
 //Leveldb store implementing store interface
@@ -54,7 +62,16 @@ func (s Store) Save(aggregateID string, events ...eventsource.Event) error {
 		history = &History{}
 	}
 
-	*history = append(*history, events...)
+	for _, event := range events {
+		serializedEvent, err := s.serializer.Marshal(event)
+
+		if err != nil {
+			return err
+		}
+
+		*history = append(*history, serializedEvent)
+	}
+
 	historyValue, err := json.Marshal(history)
 
 	if err != nil {
@@ -78,7 +95,19 @@ func (s Store) Load(aggregateID string) ([]eventsource.Event, error) {
 		return nil, ErrNilEvents
 	}
 
-	return *history, nil
+	events := make([]eventsource.Event, 0)
+
+	for _, value := range *history {
+		event, err := s.serializer.Unmarshal(value)
+
+		if err != nil {
+			return []eventsource.Event{}, err
+		}
+
+		events = append(events, event)
+	}
+
+	return events, nil
 }
 
 func (s Store) getHistory(aggregateID string) (*History, error) {
@@ -115,4 +144,70 @@ type EventSerializer interface {
 
 type JSONSerializer struct {
 	eventTypes map[string]reflect.Type
+}
+
+func NewSerializer(events ...eventsource.Event) EventSerializer {
+	s := &JSONSerializer{
+		eventTypes: make(map[string]reflect.Type),
+	}
+
+	s.Register(events...)
+
+	return s
+}
+
+func (j *JSONSerializer) Register(events ...eventsource.Event) {
+
+	for _, event := range events {
+		rawType, name := GetTypeName(event)
+		j.eventTypes[name] = rawType
+	}
+}
+
+func (j *JSONSerializer) Marshal(e eventsource.Event) (SerializedEvent, error) {
+
+	serializedEvent := SerializedEvent{}
+	_, name := GetTypeName(e)
+	serializedEvent.Type = name
+
+	data, err := json.Marshal(e)
+
+	if err != nil {
+		return SerializedEvent{}, err
+	}
+
+	serializedEvent.Data = data
+
+	return serializedEvent, nil
+}
+
+func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (eventsource.Event, error) {
+
+	t, ok := j.eventTypes[serializedEvent.Type]
+
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("unbound event type, %v", serializedEvent.Type))
+	}
+
+	v := reflect.New(t).Interface()
+
+	err := json.Unmarshal(serializedEvent.Data, v)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.(eventsource.Event), nil
+}
+
+func GetTypeName(source interface{}) (reflect.Type, string) {
+
+	rawType := reflect.TypeOf(source)
+
+	if rawType.Kind() == reflect.Ptr {
+		rawType = rawType.Elem()
+	}
+
+	name := rawType.String()
+	parts := strings.Split(name, ".")
+	return rawType, parts[1]
 }
