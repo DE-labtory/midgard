@@ -1,8 +1,9 @@
-package eventsource
+package repository
 
 import (
 	"errors"
 
+	"github.com/it-chain/eventsource"
 	"github.com/it-chain/eventsource/store"
 )
 
@@ -13,7 +14,7 @@ type Repository struct {
 	store store.EventStore
 }
 
-func (r *Repository) Load(aggregate Aggregate, aggregateID string) error {
+func (r *Repository) Load(aggregate eventsource.Aggregate, aggregateID string) error {
 
 	if aggregateID == "" {
 		return ErrInvaildAggregateID
@@ -38,4 +39,13 @@ func (r *Repository) Load(aggregate Aggregate, aggregateID string) error {
 	}
 
 	return nil
+}
+
+func (r *Repository) Save(aggregateID string, events ...eventsource.Event) error {
+
+	if len(events) == 0 {
+		return nil
+	}
+
+	return r.store.Save(aggregateID, events...)
 }
