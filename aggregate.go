@@ -2,7 +2,6 @@ package eventsource
 
 //Domain Entitiy의 Aggregate
 type Aggregate interface{
-	CommandHandler
 	EventReceptor
 }
 
