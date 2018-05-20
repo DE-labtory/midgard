@@ -14,6 +14,12 @@ type Repository struct {
 	store store.EventStore
 }
 
+func New(store store.EventStore) *Repository {
+	return &Repository{
+		store: store,
+	}
+}
+
 func (r *Repository) Load(aggregate eventsource.Aggregate, aggregateID string) error {
 
 	if aggregateID == "" {
