@@ -3,6 +3,10 @@ package rabbitmq
 import (
 	"encoding/json"
 
+	"reflect"
+
+	"log"
+
 	"github.com/it-chain/eventsource"
 	"github.com/streadway/amqp"
 )
@@ -65,7 +69,14 @@ func (c *Client) Publish(exchange string, topic string, event eventsource.Event)
 		return err
 	}
 
-	data, err := json.Marshal(event)
+	b, err := json.Marshal(event)
+
+	eventMessage := EventMessage{
+		EventType: reflect.TypeOf(event).Name(),
+		Data:      b,
+	}
+
+	data, err := json.Marshal(eventMessage)
 
 	if err != nil {
 		return err
@@ -82,7 +93,7 @@ func (c *Client) Publish(exchange string, topic string, event eventsource.Event)
 		false,    // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(data),
+			Body:        data,
 		})
 
 	if err != nil {
@@ -166,7 +177,11 @@ func (c *Client) Consume(exchange string, topic string, source interface{}) erro
 			eventMessasge := &EventMessage{}
 			err := json.Unmarshal(data, eventMessasge)
 
-			c.router.Route()
+			if err != nil {
+				log.Print(err.Error())
+			}
+
+			c.router.Route(eventMessasge.Data, eventMessasge.EventType)
 		}
 	}()
 

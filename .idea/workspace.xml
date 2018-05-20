@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5ed7f400-5fc7-4fe9-a002-4e719fadf2c3" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/bus.go" afterPath="$PROJECT_DIR$/bus.go" />
       <change beforePath="$PROJECT_DIR$/bus/rabbitmq/client.go" afterPath="$PROJECT_DIR$/bus/rabbitmq/client.go" />
       <change beforePath="$PROJECT_DIR$/router.go" afterPath="$PROJECT_DIR$/router.go" />
       <change beforePath="$PROJECT_DIR$/router_test.go" afterPath="$PROJECT_DIR$/router_test.go" />
@@ -17,56 +16,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="store.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/store/leveldb/store.go">
+      <file leaf-file-name="router_test.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/router_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="337">
-              <caret line="199" column="0" lean-forward="false" selection-start-line="199" selection-start-column="0" selection-end-line="210" selection-end-column="1" />
+            <state relative-caret-position="210">
+              <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="event.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/event.go">
+      <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/example/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="24" column="45" lean-forward="true" selection-start-line="24" selection-start-column="45" selection-end-line="24" selection-end-column="45" />
+            <state relative-caret-position="285">
+              <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="router.go" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/router.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="382">
-              <caret line="92" column="0" lean-forward="true" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
-              <folding>
-                <element signature="e#21#87#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="value.go" pinned="false" current-in-tab="false">
-        <entry file="file:///usr/local/Cellar/go/1.10/libexec/src/reflect/value.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="202">
-              <caret line="307" column="0" lean-forward="false" selection-start-line="307" selection-start-column="0" selection-end-line="307" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="client.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="client.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bus/rabbitmq/client.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
-              <caret line="155" column="24" lean-forward="false" selection-start-line="155" selection-start-column="24" selection-end-line="155" selection-end-column="24" />
-              <folding>
-                <element signature="e#18#110#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="371">
+              <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -81,41 +56,33 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="repository.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/repository/repository.go">
+      <file leaf-file-name="glide.yaml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/glide.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="41" column="23" lean-forward="true" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="23" />
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="router_test.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/router_test.go">
+      <file leaf-file-name="router.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/router.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="1725">
+              <caret line="115" column="1" lean-forward="false" selection-start-line="115" selection-start-column="1" selection-end-line="115" selection-end-column="1" />
+              <folding>
+                <element signature="e#21#76#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="bus.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/bus.go">
+      <file leaf-file-name="testing.go" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/local/Cellar/go/1.10/libexec/src/testing/testing.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="40" lean-forward="true" selection-start-line="12" selection-start-column="40" selection-end-line="12" selection-end-column="40" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="command.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/command.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+            <state relative-caret-position="160">
+              <caret line="778" column="0" lean-forward="false" selection-start-line="778" selection-start-column="0" selection-end-line="778" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -136,6 +103,7 @@
       <find>eventsource</find>
       <find>GetTypeName</find>
       <find>CommandDispatcher</find>
+      <find>data</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -168,9 +136,9 @@
         <option value="$PROJECT_DIR$/bus/rabbitmq/server.go" />
         <option value="$PROJECT_DIR$/bus/rabbitmq/client_test.go" />
         <option value="$PROJECT_DIR$/bus.go" />
-        <option value="$PROJECT_DIR$/bus/rabbitmq/client.go" />
         <option value="$PROJECT_DIR$/router_test.go" />
         <option value="$PROJECT_DIR$/router.go" />
+        <option value="$PROJECT_DIR$/bus/rabbitmq/client.go" />
       </list>
     </option>
   </component>
@@ -222,18 +190,7 @@
             <path>
               <item name="eventsource" type="b2602c69:ProjectViewProjectNode" />
               <item name="eventsource" type="462c0819:PsiDirectoryNode" />
-              <item name="repository" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="eventsource" type="b2602c69:ProjectViewProjectNode" />
-              <item name="eventsource" type="462c0819:PsiDirectoryNode" />
-              <item name="store" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="eventsource" type="b2602c69:ProjectViewProjectNode" />
-              <item name="eventsource" type="462c0819:PsiDirectoryNode" />
-              <item name="store" type="462c0819:PsiDirectoryNode" />
-              <item name="leveldb" type="462c0819:PsiDirectoryNode" />
+              <item name="example" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -335,34 +292,34 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 22m 52s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 07m 18s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 23m 06s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 07m 46s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 23m 53s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 08m 02s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 25m 03s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 08m 51s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 25m 45s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 08m 59s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 25m 58s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 10m 11s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 26m 32s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 10m 18s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 26m 40s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 12m 17s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 26m 43s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 12m 25s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 01h 26m 46s.xml">
+    <history-entry file="TestNewParamBasedRouter_in_router_test_go - 2018.05.21 at 02h 12m 58s.xml">
       <configuration name="TestNewParamBasedRouter in router_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
   </component>
@@ -375,7 +332,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25678733" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34162897" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -397,7 +354,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="28" />
+      <option name="time" value="35" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -406,6 +363,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -474,6 +432,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -614,14 +573,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/local/Cellar/go/1.10/libexec/src/testing/testing.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="227">
-          <caret line="782" column="0" lean-forward="false" selection-start-line="782" selection-start-column="0" selection-end-line="782" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../mishudark/eventhus/utils/uuid.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -637,14 +588,6 @@
             <element signature="e#22#182#0" expanded="false" />
             <marker date="1526738646067" expanded="true" signature="839:1102" ph="..." />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -706,24 +649,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bus/rabbitmq/client_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bus/rabbitmq/client.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
-          <caret line="155" column="24" lean-forward="false" selection-start-line="155" selection-start-column="24" selection-end-line="155" selection-end-column="24" />
-          <folding>
-            <element signature="e#18#110#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/repository/repository.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
@@ -743,26 +668,82 @@
     <entry file="file:///usr/local/Cellar/go/1.10/libexec/src/reflect/value.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="202">
-          <caret line="307" column="0" lean-forward="false" selection-start-line="307" selection-start-column="0" selection-end-line="307" selection-end-column="0" />
+          <caret line="206" column="0" lean-forward="false" selection-start-line="206" selection-start-column="0" selection-end-line="206" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/Cellar/go/1.10/libexec/src/encoding/json/decode.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="179" column="0" lean-forward="true" selection-start-line="179" selection-start-column="0" selection-end-line="179" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/Cellar/go/1.10/libexec/src/reflect/type.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="3166" column="15" lean-forward="false" selection-start-line="3166" selection-start-column="11" selection-end-line="3166" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/glide.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/Cellar/go/1.10/libexec/src/testing/testing.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="778" column="0" lean-forward="false" selection-start-line="778" selection-start-column="0" selection-end-line="778" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/router_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+        <state relative-caret-position="210">
+          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/router.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
-          <caret line="92" column="0" lean-forward="true" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
+        <state relative-caret-position="1725">
+          <caret line="115" column="1" lean-forward="false" selection-start-line="115" selection-start-column="1" selection-end-line="115" selection-end-column="1" />
           <folding>
-            <element signature="e#21#87#0" expanded="true" />
+            <element signature="e#21#76#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bus/rabbitmq/client_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bus/rabbitmq/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

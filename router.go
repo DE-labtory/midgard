@@ -5,13 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 var ErrTypeNotFound = errors.New("Type of handler not found")
 
 type Router interface {
-	Route(param interface{}) error
+	Route(data []byte, typeName string) error
 	SetHandler(handler interface{}) error
 }
 
@@ -78,28 +77,27 @@ func createEventHandler(method reflect.Method, handler interface{}) func(interfa
 
 func (c ParamBasedRouter) Route(data []byte, typeName string) error {
 
-	paramType, _, err := c.findTypeOfHandler(typeName)
+	paramType, handler, err := c.findTypeOfHandler(typeName)
 
 	if err != nil {
 		errors.New(fmt.Sprintf("No handler found for param [%s]", typeName))
 	}
 
+	fmt.Println(paramType)
+
 	v := reflect.New(paramType)
 	initializeStruct(paramType, v.Elem())
-	param := v.Elem().Interface()
+	paramInterface := v.Interface()
 
-	fmt.Println(reflect.TypeOf(param))
-	fmt.Println(data)
-
-	err = json.Unmarshal(data, &param)
-
-	fmt.Println(param)
+	err = json.Unmarshal(data, paramInterface)
 
 	if err != nil {
 		return err
 	}
 
-	//handler(param)
+	paramValue := reflect.ValueOf(paramInterface).Elem().Interface()
+
+	handler(paramValue)
 
 	return nil
 }
@@ -107,7 +105,7 @@ func (c ParamBasedRouter) Route(data []byte, typeName string) error {
 func (c ParamBasedRouter) findTypeOfHandler(typeName string) (reflect.Type, func(param interface{}), error) {
 
 	for paramType, handler := range c.handlerMap {
-		name := getTypeName(paramType)
+		name := paramType.Name()
 
 		if name == typeName {
 			return paramType, handler, nil
@@ -115,17 +113,6 @@ func (c ParamBasedRouter) findTypeOfHandler(typeName string) (reflect.Type, func
 	}
 
 	return nil, nil, ErrTypeNotFound
-}
-
-func getTypeName(rawType reflect.Type) string {
-
-	if rawType.Kind() == reflect.Ptr {
-		rawType = rawType.Elem()
-	}
-
-	name := rawType.String()
-	parts := strings.Split(name, ".")
-	return parts[1]
 }
 
 func initializeStruct(t reflect.Type, v reflect.Value) {

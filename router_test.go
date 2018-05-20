@@ -1,8 +1,11 @@
 package eventsource_test
 
 import (
+	"fmt"
 	"log"
 	"testing"
+
+	"reflect"
 
 	"encoding/json"
 
@@ -21,7 +24,31 @@ func TestNewParamBasedRouter(t *testing.T) {
 		Name: "jun",
 	}
 
-	b, _ := json.Marshal(cmd)
+	typ := reflect.TypeOf(cmd)
+	fmt.Println(typ.Name())
+
+	b, err := json.Marshal(cmd)
+	assert.NoError(t, err)
+
+	fmt.Println(b)
+
+	//typ := reflect.TypeOf(cmd)
+	//v := reflect.New(typ)
+	//
+	//initializeStruct(typ, v.Elem())
+	//paramInterface := v.Interface()
+	//
+	////cmd2 := UserNameUpdateCommand{}
+	////
+	////fmt.Println(reflect.TypeOf(cmd2))
+	////fmt.Println(reflect.TypeOf(paramInterface))
+	////
+	//err = json.Unmarshal(b, paramInterface)
+	//fmt.Println(reflect.ValueOf(paramInterface).Elem())
+	////err = json.Unmarshal(b, &cmd2)
+	////assert.NoError(t, err)
+	//fmt.Println(reflect.ValueOf(paramInterface).Elem().Interface())
+	////err = d.Route(b, "UserNameUpdateCommand")
 
 	err = d.Route(b, "UserNameUpdateCommand")
 	assert.NoError(t, err)
@@ -44,5 +71,53 @@ func (d *Dispatcher) Handle(command UserAddCommand) {
 }
 
 func (d *Dispatcher) HandleNameUpdateCommand(command UserNameUpdateCommand) {
-	log.Print("hello world2")
+	fmt.Println("hello world2")
+}
+
+//func TestMarshal(t *testing.T) {
+//
+//	cmd := UserNameUpdateCommand{
+//		Name: "jun",
+//	}
+//
+//	typ := reflect.TypeOf(cmd)
+//	v := reflect.New(typ)
+//	initializeStruct(typ, v.Elem())
+//	emtpy := v.Interface()
+//
+//	b, _ := json.Marshal(cmd)
+//
+//	json.Unmarshal(b, emtpy)
+//
+//	fmt.Println(emtpy)
+//
+//	command := emtpy.(eventsource.Command)
+//
+//	//method.Func.Call([]reflect.Value{sourceValue, eventValue})
+//}
+
+func call(user UserNameUpdateCommand) {
+
+}
+
+func initializeStruct(t reflect.Type, v reflect.Value) {
+	for i := 0; i < v.NumField(); i++ {
+		f := v.Field(i)
+		ft := t.Field(i)
+		switch ft.Type.Kind() {
+		case reflect.Map:
+			f.Set(reflect.MakeMap(ft.Type))
+		case reflect.Slice:
+			f.Set(reflect.MakeSlice(ft.Type, 0, 0))
+		case reflect.Chan:
+			f.Set(reflect.MakeChan(ft.Type, 0))
+		case reflect.Struct:
+			initializeStruct(ft.Type, f)
+		case reflect.Ptr:
+			fv := reflect.New(ft.Type.Elem())
+			initializeStruct(ft.Type.Elem(), fv.Elem())
+			f.Set(fv)
+		default:
+		}
+	}
 }
