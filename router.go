@@ -1,13 +1,18 @@
 package eventsource
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
+var ErrTypeNotFound = errors.New("Type of handler not found")
+
 type Router interface {
-	Route(command Command)
+	Route(param interface{}) error
+	SetHandler(handler interface{}) error
 }
 
 type ParamBasedRouter struct {
@@ -71,14 +76,76 @@ func createEventHandler(method reflect.Method, handler interface{}) func(interfa
 	}
 }
 
-func (c ParamBasedRouter) Dispatch(param interface{}) error {
+func (c ParamBasedRouter) Route(data []byte, typeName string) error {
 
-	eventType := reflect.TypeOf(param)
-	if handler, ok := c.handlerMap[eventType]; ok {
-		handler(param)
-	} else {
-		return errors.New(fmt.Sprintf("No handler found for command [%s]", eventType.String()))
+	paramType, _, err := c.findTypeOfHandler(typeName)
+
+	if err != nil {
+		errors.New(fmt.Sprintf("No handler found for param [%s]", typeName))
 	}
 
+	v := reflect.New(paramType)
+	initializeStruct(paramType, v.Elem())
+	param := v.Elem().Interface()
+
+	fmt.Println(reflect.TypeOf(param))
+	fmt.Println(data)
+
+	err = json.Unmarshal(data, &param)
+
+	fmt.Println(param)
+
+	if err != nil {
+		return err
+	}
+
+	//handler(param)
+
 	return nil
+}
+
+func (c ParamBasedRouter) findTypeOfHandler(typeName string) (reflect.Type, func(param interface{}), error) {
+
+	for paramType, handler := range c.handlerMap {
+		name := getTypeName(paramType)
+
+		if name == typeName {
+			return paramType, handler, nil
+		}
+	}
+
+	return nil, nil, ErrTypeNotFound
+}
+
+func getTypeName(rawType reflect.Type) string {
+
+	if rawType.Kind() == reflect.Ptr {
+		rawType = rawType.Elem()
+	}
+
+	name := rawType.String()
+	parts := strings.Split(name, ".")
+	return parts[1]
+}
+
+func initializeStruct(t reflect.Type, v reflect.Value) {
+	for i := 0; i < v.NumField(); i++ {
+		f := v.Field(i)
+		ft := t.Field(i)
+		switch ft.Type.Kind() {
+		case reflect.Map:
+			f.Set(reflect.MakeMap(ft.Type))
+		case reflect.Slice:
+			f.Set(reflect.MakeSlice(ft.Type, 0, 0))
+		case reflect.Chan:
+			f.Set(reflect.MakeChan(ft.Type, 0))
+		case reflect.Struct:
+			initializeStruct(ft.Type, f)
+		case reflect.Ptr:
+			fv := reflect.New(ft.Type.Elem())
+			initializeStruct(ft.Type.Elem(), fv.Elem())
+			f.Set(fv)
+		default:
+		}
+	}
 }

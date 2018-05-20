@@ -4,6 +4,8 @@ import (
 	"log"
 	"testing"
 
+	"encoding/json"
+
 	"github.com/it-chain/eventsource"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,14 +17,19 @@ func TestNewParamBasedRouter(t *testing.T) {
 	err = d.SetHandler(&Dispatcher{})
 	assert.NoError(t, err)
 
-	d.Dispatch(UserAddCommand{})
-	d.Dispatch(UserNameUpdateCommand{})
+	cmd := UserNameUpdateCommand{
+		Name: "jun",
+	}
+
+	b, _ := json.Marshal(cmd)
+
+	err = d.Route(b, "UserNameUpdateCommand")
 	assert.NoError(t, err)
 }
 
 type UserNameUpdateCommand struct {
 	eventsource.CommandModel
-	name string
+	Name string
 }
 
 type UserAddCommand struct {

@@ -7,8 +7,14 @@ import (
 	"github.com/streadway/amqp"
 )
 
+type EventMessage struct {
+	EventType string
+	Data      []byte
+}
+
 type Client struct {
-	conn *amqp.Connection
+	conn   *amqp.Connection
+	router eventsource.Router
 }
 
 func Connect(rabbitmqUrl string) *Client {
@@ -23,8 +29,11 @@ func Connect(rabbitmqUrl string) *Client {
 		panic("Failed to connect to RabbitMQ" + err.Error())
 	}
 
+	p, _ := eventsource.NewParamBasedRouter()
+
 	return &Client{
-		conn: conn,
+		conn:   conn,
+		router: p,
 	}
 }
 
@@ -35,6 +44,7 @@ func (c *Client) Close() {
 func (c *Client) Publish(exchange string, topic string, event eventsource.Event) error {
 
 	ch, err := c.conn.Channel()
+
 	if err != nil {
 		return err
 	}
@@ -133,9 +143,9 @@ func (c *Client) consume(exchange string, topic string) (<-chan amqp.Delivery, e
 	return msgs, nil
 }
 
-type Handler func(delivery amqp.Delivery)
+type Handler func(event eventsource.Event)
 
-func (c *Client) Consume(exchange string, topic string, handler Handler) error {
+func (c *Client) Consume(exchange string, topic string, source interface{}) error {
 
 	chanDelivery, err := c.consume(exchange, topic)
 
@@ -143,9 +153,20 @@ func (c *Client) Consume(exchange string, topic string, handler Handler) error {
 		return err
 	}
 
+	err = c.router.SetHandler(source)
+
+	if err != nil {
+		return err
+	}
+
 	go func() {
 		for delivery := range chanDelivery {
-			handler(delivery)
+			data := delivery.Body
+
+			eventMessasge := &EventMessage{}
+			err := json.Unmarshal(data, eventMessasge)
+
+			c.router.Route()
 		}
 	}()
 

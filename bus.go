@@ -6,9 +6,9 @@ type EventBus interface {
 }
 
 type Publisher interface {
-	Publish(topic string, event Event)
+	Publish(exchange string, topic string, event Event)
 }
 
 type Subscriber interface {
-	Subscribe(topic string)
+	Subscribe(topic string, event Event)
 }
