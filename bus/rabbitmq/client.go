@@ -57,7 +57,7 @@ func (c *Client) Publish(exchange string, topic string, event eventsource.Event)
 
 	err = ch.ExchangeDeclare(
 		exchange, // name
-		"direct", // type
+		"topic",  // type
 		true,     // durable
 		false,    // auto-deleted
 		false,    // internal
@@ -111,7 +111,19 @@ func (c *Client) consume(exchange string, topic string) (<-chan amqp.Delivery, e
 		return nil, err
 	}
 
-	defer ch.Close()
+	err = ch.ExchangeDeclare(
+		exchange, // name
+		"topic",  // type
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
+	)
+
+	if err != nil {
+		return nil, err
+	}
 
 	q, err := ch.QueueDeclare(
 		"",    // name

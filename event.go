@@ -1,8 +1,6 @@
 package eventsource
 
-import (
-	"time"
-)
+import "time"
 
 type Event interface {
 	GetType() string
@@ -14,8 +12,8 @@ type Event interface {
 type EventModel struct {
 	AggregateID string
 	Version     int
-	Time        time.Time
 	Type        string
+	Time        time.Time
 }
 
 func (e EventModel) GetType() string {

@@ -83,8 +83,6 @@ func (c ParamBasedRouter) Route(data []byte, typeName string) error {
 		errors.New(fmt.Sprintf("No handler found for param [%s]", typeName))
 	}
 
-	fmt.Println(paramType)
-
 	v := reflect.New(paramType)
 	initializeStruct(paramType, v.Elem())
 	paramInterface := v.Interface()
@@ -119,6 +117,11 @@ func initializeStruct(t reflect.Type, v reflect.Value) {
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Field(i)
 		ft := t.Field(i)
+
+		if !f.CanSet() {
+			continue
+		}
+
 		switch ft.Type.Kind() {
 		case reflect.Map:
 			f.Set(reflect.MakeMap(ft.Type))

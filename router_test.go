@@ -9,6 +9,8 @@ import (
 
 	"encoding/json"
 
+	"time"
+
 	"github.com/it-chain/eventsource"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,9 +25,6 @@ func TestNewParamBasedRouter(t *testing.T) {
 	cmd := UserNameUpdateCommand{
 		Name: "jun",
 	}
-
-	typ := reflect.TypeOf(cmd)
-	fmt.Println(typ.Name())
 
 	b, err := json.Marshal(cmd)
 	assert.NoError(t, err)
@@ -55,12 +54,12 @@ func TestNewParamBasedRouter(t *testing.T) {
 }
 
 type UserNameUpdateCommand struct {
-	eventsource.CommandModel
+	eventsource.EventModel
 	Name string
 }
 
 type UserAddCommand struct {
-	eventsource.CommandModel
+	eventsource.EventModel
 }
 
 type Dispatcher struct {
@@ -74,27 +73,23 @@ func (d *Dispatcher) HandleNameUpdateCommand(command UserNameUpdateCommand) {
 	fmt.Println("hello world2")
 }
 
-//func TestMarshal(t *testing.T) {
-//
-//	cmd := UserNameUpdateCommand{
-//		Name: "jun",
-//	}
-//
-//	typ := reflect.TypeOf(cmd)
-//	v := reflect.New(typ)
-//	initializeStruct(typ, v.Elem())
-//	emtpy := v.Interface()
-//
-//	b, _ := json.Marshal(cmd)
-//
-//	json.Unmarshal(b, emtpy)
-//
-//	fmt.Println(emtpy)
-//
-//	command := emtpy.(eventsource.Command)
-//
-//	//method.Func.Call([]reflect.Value{sourceValue, eventValue})
-//}
+func TestMarshal(t *testing.T) {
+
+	ti := time.Now()
+
+	b, _ := json.Marshal(ti)
+
+	ti2 := &time.Time{}
+
+	err := json.Unmarshal(b, ti2)
+
+	fmt.Println(ti2.Location())
+
+	fmt.Println(ti2)
+	assert.NoError(t, err)
+
+	//method.Func.Call([]reflect.Value{sourceValue, eventValue})
+}
 
 func call(user UserNameUpdateCommand) {
 
