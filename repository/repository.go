@@ -44,7 +44,7 @@ func (r *Repository) Load(aggregate eventsource.Aggregate, aggregateID string) e
 func (r *Repository) Save(aggregateID string, events ...eventsource.Event) error {
 
 	if len(events) == 0 {
-		return nil
+		return errors.New("no events to save")
 	}
 
 	return r.store.Save(aggregateID, events...)
