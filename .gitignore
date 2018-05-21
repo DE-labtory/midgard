@@ -1,0 +1,6 @@
+#goland
+.idea
+
+#vendor
+vendor/
+
