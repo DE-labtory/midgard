@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/bus/rabbitmq"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/bus/rabbitmq"
 )
 
 type UserCreateCommand struct {
-	eventsource.CommandModel
+	midgard.CommandModel
 }
 
 type UserNameUpdateCommand struct {
-	eventsource.CommandModel
+	midgard.CommandModel
 	Name string
 }
 
@@ -27,7 +27,7 @@ func main() {
 	err = c.Publish("Command", "User", UserNameUpdateCommand{
 
 		Name: "jun2",
-		CommandModel: eventsource.CommandModel{
+		CommandModel: midgard.CommandModel{
 			AggregateID: "123",
 		},
 	})

@@ -1,4 +1,4 @@
-package eventsource_test
+package midgard_test
 
 import (
 	"fmt"
@@ -8,18 +8,18 @@ import (
 
 	"os"
 
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/store/leveldb"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/store/leveldb"
 	"github.com/stretchr/testify/assert"
 )
 
 //aggregate
 type UserAggregate struct {
 	Name string
-	eventsource.EventModel
+	midgard.EventModel
 }
 
-func (u *UserAggregate) On(event eventsource.Event) error {
+func (u *UserAggregate) On(event midgard.Event) error {
 
 	switch v := event.(type) {
 
@@ -38,13 +38,13 @@ func (u *UserAggregate) On(event eventsource.Event) error {
 
 //event
 type UserCreated struct {
-	eventsource.EventModel
+	midgard.EventModel
 }
 
 //event
 type UserUpdated struct {
 	Name string
-	eventsource.EventModel
+	midgard.EventModel
 }
 
 func TestNewRepository(t *testing.T) {
@@ -53,12 +53,12 @@ func TestNewRepository(t *testing.T) {
 	defer os.RemoveAll(path)
 
 	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserCreated{}, UserUpdated{}))
-	r := eventsource.NewRepo(store, nil)
+	r := midgard.NewRepo(store, nil)
 
 	aggregateID := "123"
 
 	err := r.Save(aggregateID, UserCreated{
-		EventModel: eventsource.EventModel{
+		EventModel: midgard.EventModel{
 			AggregateID: aggregateID,
 			Type:        "User",
 		},
@@ -67,7 +67,7 @@ func TestNewRepository(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = r.Save(aggregateID, UserUpdated{
-		EventModel: eventsource.EventModel{
+		EventModel: midgard.EventModel{
 			AggregateID: aggregateID,
 			Type:        "User",
 		},
@@ -77,7 +77,7 @@ func TestNewRepository(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = r.Save(aggregateID, UserUpdated{
-		EventModel: eventsource.EventModel{
+		EventModel: midgard.EventModel{
 			AggregateID: aggregateID,
 			Type:        "User",
 		},

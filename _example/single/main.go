@@ -7,9 +7,9 @@ import (
 
 	"sync"
 
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/bus/rabbitmq"
-	"github.com/it-chain/eventsource/store/leveldb"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/bus/rabbitmq"
+	"github.com/it-chain/midgard/store/leveldb"
 )
 
 var wg = sync.WaitGroup{}
@@ -17,17 +17,17 @@ var wg = sync.WaitGroup{}
 // aggregate
 type User struct {
 	name string
-	eventsource.AggregateModel
+	midgard.AggregateModel
 }
 
 // Command
 type UserCreateCommand struct {
-	eventsource.CommandModel
+	midgard.CommandModel
 }
 
 // Event
 type UserCreatedEvent struct {
-	eventsource.EventModel
+	midgard.EventModel
 }
 
 // EventHandler
@@ -41,14 +41,14 @@ func (u UserEventHandler) UserCreate(event UserCreatedEvent) {
 
 // CommandHandler
 type UserCommandHandler struct {
-	eventRepository *eventsource.Repository
+	eventRepository *midgard.Repository
 }
 
 func (u UserCommandHandler) UserCreated(command UserCreateCommand) {
 
-	events := make([]eventsource.Event, 0)
+	events := make([]midgard.Event, 0)
 	events = append(events, UserCreatedEvent{
-		eventsource.EventModel{
+		midgard.EventModel{
 			AggregateID: "123",
 			Type:        "User",
 		},
@@ -67,7 +67,7 @@ func main() {
 
 	c := rabbitmq.Connect("")
 	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserCreatedEvent{}))
-	r := eventsource.NewRepo(store, c)
+	r := midgard.NewRepo(store, c)
 
 	defer os.RemoveAll(path)
 

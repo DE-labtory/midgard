@@ -6,8 +6,8 @@ import (
 
 	"encoding/json"
 
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/bus"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/bus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,7 +32,7 @@ func TestNewParamBasedRouter(t *testing.T) {
 }
 
 type UserNameUpdateCommand struct {
-	eventsource.EventModel
+	midgard.EventModel
 	Name string
 }
 

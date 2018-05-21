@@ -5,16 +5,16 @@ import (
 
 	"sync"
 
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/bus/rabbitmq"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/bus/rabbitmq"
 )
 
 type UserCreatedEvent struct {
-	eventsource.EventModel
+	midgard.EventModel
 }
 
 type UserNameUpdatedEvent struct {
-	eventsource.EventModel
+	midgard.EventModel
 	Name string
 }
 

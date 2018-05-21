@@ -9,8 +9,8 @@ import (
 
 	"time"
 
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/bus/rabbitmq"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/bus/rabbitmq"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,7 +25,7 @@ func TestConnect(t *testing.T) {
 
 	err = c.Publish("asd", "asd", UserNameUpdateEvent{
 		Name: "JUN",
-		EventModel: eventsource.EventModel{
+		EventModel: midgard.EventModel{
 			AggregateID: "123",
 			Time:        time.Now(),
 			Type:        "123",
@@ -34,7 +34,7 @@ func TestConnect(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = c.Publish("asd", "asd", UserAddCommand{
-		CommandModel: eventsource.CommandModel{
+		CommandModel: midgard.CommandModel{
 			AggregateID: "123",
 		}})
 
@@ -44,12 +44,12 @@ func TestConnect(t *testing.T) {
 }
 
 type UserNameUpdateEvent struct {
-	eventsource.EventModel
+	midgard.EventModel
 	Name string
 }
 
 type UserAddCommand struct {
-	eventsource.CommandModel
+	midgard.CommandModel
 }
 
 type Dispatcher struct {

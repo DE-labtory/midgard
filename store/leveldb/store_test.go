@@ -7,14 +7,14 @@ import (
 
 	"os"
 
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/store/leveldb"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/store/leveldb"
 	"github.com/stretchr/testify/assert"
 )
 
 type UserAddedEvent struct {
 	Name string
-	eventsource.EventModel
+	midgard.EventModel
 }
 
 func TestNew(t *testing.T) {
@@ -29,14 +29,14 @@ func TestNew(t *testing.T) {
 	aggregateID = "1"
 
 	events := []UserAddedEvent{
-		{Name: "jun", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
-		{Name: "jun2", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
-		{Name: "jun3", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun2", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun3", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
 	}
 
 	events2 := []UserAddedEvent{
-		{Name: "jun", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
-		{Name: "jun2", EventModel: eventsource.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
+		{Name: "jun", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
+		{Name: "jun2", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
 	}
 
 	//when
@@ -63,15 +63,15 @@ func TestNew(t *testing.T) {
 }
 
 ////Convert a slice or array of a specific type to array of interface{}
-func ToEvent(event ...UserAddedEvent) []eventsource.Event {
-	intf := make([]eventsource.Event, len(event))
+func ToEvent(event ...UserAddedEvent) []midgard.Event {
+	intf := make([]midgard.Event, len(event))
 	for i, v := range event {
-		intf[i] = eventsource.Event(v)
+		intf[i] = midgard.Event(v)
 	}
 	return intf
 }
 
-func ToUserAddedEvent(t *testing.T, events ...eventsource.Event) []UserAddedEvent {
+func ToUserAddedEvent(t *testing.T, events ...midgard.Event) []UserAddedEvent {
 
 	uae := make([]UserAddedEvent, 0)
 	for _, v := range events {

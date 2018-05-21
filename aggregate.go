@@ -1,4 +1,4 @@
-package eventsource
+package midgard
 
 //Domain Entitiy의 Aggregate
 type Aggregate interface {

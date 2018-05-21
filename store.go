@@ -1,4 +1,4 @@
-package eventsource
+package midgard
 
 type EventStore interface {
 	Save(aggregateID string, events ...Event) error

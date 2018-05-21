@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/it-chain/eventsource"
 	"github.com/it-chain/leveldb-wrapper"
+	"github.com/it-chain/midgard"
 )
 
 var ErrNilEvents = errors.New("no event history exist")
@@ -30,7 +30,7 @@ type Store struct {
 	serializer EventSerializer
 }
 
-func NewEventStore(path string, serializer EventSerializer) eventsource.EventStore {
+func NewEventStore(path string, serializer EventSerializer) midgard.EventStore {
 
 	db := leveldbwrapper.CreateNewDB(path)
 	db.Open()
@@ -43,7 +43,7 @@ func NewEventStore(path string, serializer EventSerializer) eventsource.EventSto
 }
 
 //Save Events to leveldb(key is aggregateID)
-func (s Store) Save(aggregateID string, events ...eventsource.Event) error {
+func (s Store) Save(aggregateID string, events ...midgard.Event) error {
 
 	s.mux.Lock()
 	defer s.mux.Unlock()
@@ -79,7 +79,7 @@ func (s Store) Save(aggregateID string, events ...eventsource.Event) error {
 }
 
 //Load Aggregate Event from leveldb
-func (s Store) Load(aggregateID string) ([]eventsource.Event, error) {
+func (s Store) Load(aggregateID string) ([]midgard.Event, error) {
 
 	history, err := s.getHistory(aggregateID)
 
@@ -92,13 +92,13 @@ func (s Store) Load(aggregateID string) ([]eventsource.Event, error) {
 		return nil, ErrNilEvents
 	}
 
-	events := make([]eventsource.Event, 0)
+	events := make([]midgard.Event, 0)
 
 	for _, value := range *history {
 		event, err := s.serializer.Unmarshal(value)
 
 		if err != nil {
-			return []eventsource.Event{}, err
+			return []midgard.Event{}, err
 		}
 
 		events = append(events, event)
@@ -133,17 +133,17 @@ func (s Store) getHistory(aggregateID string) (*History, error) {
 
 type EventSerializer interface {
 	// MarshalEvent converts an Event to a Record
-	Marshal(event eventsource.Event) (SerializedEvent, error)
+	Marshal(event midgard.Event) (SerializedEvent, error)
 
 	// UnmarshalEvent converts an Event backed into a Record
-	Unmarshal(serializedEvent SerializedEvent) (eventsource.Event, error)
+	Unmarshal(serializedEvent SerializedEvent) (midgard.Event, error)
 }
 
 type JSONSerializer struct {
 	eventTypes map[string]reflect.Type
 }
 
-func NewSerializer(events ...eventsource.Event) EventSerializer {
+func NewSerializer(events ...midgard.Event) EventSerializer {
 
 	s := &JSONSerializer{
 		eventTypes: make(map[string]reflect.Type),
@@ -154,7 +154,7 @@ func NewSerializer(events ...eventsource.Event) EventSerializer {
 	return s
 }
 
-func (j *JSONSerializer) Register(events ...eventsource.Event) {
+func (j *JSONSerializer) Register(events ...midgard.Event) {
 
 	for _, event := range events {
 		rawType, name := GetTypeName(event)
@@ -162,7 +162,7 @@ func (j *JSONSerializer) Register(events ...eventsource.Event) {
 	}
 }
 
-func (j *JSONSerializer) Marshal(e eventsource.Event) (SerializedEvent, error) {
+func (j *JSONSerializer) Marshal(e midgard.Event) (SerializedEvent, error) {
 
 	serializedEvent := SerializedEvent{}
 	_, name := GetTypeName(e)
@@ -179,7 +179,7 @@ func (j *JSONSerializer) Marshal(e eventsource.Event) (SerializedEvent, error) {
 	return serializedEvent, nil
 }
 
-func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (eventsource.Event, error) {
+func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (midgard.Event, error) {
 
 	t, ok := j.eventTypes[serializedEvent.Type]
 
@@ -194,7 +194,7 @@ func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (eventsource
 		return nil, err
 	}
 
-	return v.(eventsource.Event), nil
+	return v.(midgard.Event), nil
 }
 
 func GetTypeName(source interface{}) (reflect.Type, string) {

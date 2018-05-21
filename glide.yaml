@@ -1,4 +1,4 @@
-package: github.com/it-chain/eventsource
+package: github.com/it-chain/midgard
 import:
 - package: github.com/it-chain/leveldb-wrapper
   version: v1.1

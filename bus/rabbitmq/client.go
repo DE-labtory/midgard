@@ -6,7 +6,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/it-chain/eventsource/bus"
+	"github.com/it-chain/midgard/bus"
 	"github.com/streadway/amqp"
 )
 

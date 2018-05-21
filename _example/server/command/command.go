@@ -9,18 +9,18 @@ import (
 
 	"log"
 
-	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/bus/rabbitmq"
-	"github.com/it-chain/eventsource/store/leveldb"
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/bus/rabbitmq"
+	"github.com/it-chain/midgard/store/leveldb"
 )
 
 // aggregate
 type User struct {
 	Name string
-	eventsource.AggregateModel
+	midgard.AggregateModel
 }
 
-func (u User) On(event eventsource.Event) error {
+func (u User) On(event midgard.Event) error {
 
 	switch v := event.(type) {
 
@@ -39,35 +39,35 @@ func (u User) On(event eventsource.Event) error {
 
 // Command
 type UserCreateCommand struct {
-	eventsource.CommandModel
+	midgard.CommandModel
 }
 
 type UserNameUpdateCommand struct {
-	eventsource.CommandModel
+	midgard.CommandModel
 	Name string
 }
 
 // Event
 type UserCreatedEvent struct {
-	eventsource.EventModel
+	midgard.EventModel
 }
 
 type UserNameUpdatedEvent struct {
-	eventsource.EventModel
+	midgard.EventModel
 	Name string
 }
 
 // CommandHandler
 type UserCommandHandler struct {
-	eventRepository *eventsource.Repository
+	eventRepository *midgard.Repository
 }
 
 func (u UserCommandHandler) UserCreate(command UserCreateCommand) {
 
 	log.Printf("received UserCreateCommand [%s]", command)
-	events := make([]eventsource.Event, 0)
+	events := make([]midgard.Event, 0)
 	events = append(events, UserCreatedEvent{
-		eventsource.EventModel{
+		midgard.EventModel{
 			AggregateID: "123",
 			Type:        "User",
 		},
@@ -87,9 +87,9 @@ func (u UserCommandHandler) UserNameUpdate(command UserNameUpdateCommand) {
 
 	u.eventRepository.Load(user, command.AggregateID)
 
-	events := make([]eventsource.Event, 0)
+	events := make([]midgard.Event, 0)
 	events = append(events, UserNameUpdatedEvent{
-		eventsource.EventModel{
+		midgard.EventModel{
 			AggregateID: "123",
 			Type:        "User",
 		}, "Jun",
@@ -110,7 +110,7 @@ func main() {
 
 	c := rabbitmq.Connect("")
 	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserCreatedEvent{}))
-	repo := eventsource.NewRepo(store, c)
+	repo := midgard.NewRepo(store, c)
 
 	defer os.RemoveAll(path)
 
