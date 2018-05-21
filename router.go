@@ -9,11 +9,16 @@ import (
 
 var ErrTypeNotFound = errors.New("Type of handler not found")
 
+//Route data depends on type
 type Router interface {
-	Route(data []byte, typeName string) error
+
+	//route data depends on matching value
+	Route(data []byte, matchingValue string) error
+
 	SetHandler(handler interface{}) error
 }
 
+//ParamBasedRouter routes data through the structure and structure name(matching value) of the parameter
 type ParamBasedRouter struct {
 	handlerMap map[reflect.Type]func(param interface{})
 }
@@ -34,6 +39,7 @@ func NewParamBasedRouter(handlers ...interface{}) (*ParamBasedRouter, error) {
 	return p, nil
 }
 
+////handler should be a struct pointer which has handler method
 func (c *ParamBasedRouter) SetHandler(handler interface{}) error {
 
 	if reflect.TypeOf(handler).Kind() != reflect.Ptr {
@@ -75,12 +81,26 @@ func createEventHandler(method reflect.Method, handler interface{}) func(interfa
 	}
 }
 
-func (c ParamBasedRouter) Route(data []byte, typeName string) error {
+func (c ParamBasedRouter) Route(data []byte, structName string) (err error) {
 
-	paramType, handler, err := c.findTypeOfHandler(typeName)
+	defer func() {
+		if r := recover(); r != nil {
+			// find out exactly what the error was and set err
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+	}()
+
+	paramType, handler, err := c.findTypeOfHandler(structName)
 
 	if err != nil {
-		errors.New(fmt.Sprintf("No handler found for param [%s]", typeName))
+		errors.New(fmt.Sprintf("No handler found for struct [%s]", structName))
 	}
 
 	v := reflect.New(paramType)
@@ -100,6 +120,7 @@ func (c ParamBasedRouter) Route(data []byte, typeName string) error {
 	return nil
 }
 
+//find target struct by struct name
 func (c ParamBasedRouter) findTypeOfHandler(typeName string) (reflect.Type, func(param interface{}), error) {
 
 	for paramType, handler := range c.handlerMap {
@@ -113,6 +134,7 @@ func (c ParamBasedRouter) findTypeOfHandler(typeName string) (reflect.Type, func
 	return nil, nil, ErrTypeNotFound
 }
 
+//build empty struct from struct type
 func initializeStruct(t reflect.Type, v reflect.Value) {
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Field(i)

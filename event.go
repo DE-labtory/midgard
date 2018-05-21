@@ -2,18 +2,23 @@ package eventsource
 
 import "time"
 
+//Event interface
 type Event interface {
 	GetType() string
 	GetAggregateID() string
 	GetVersion() int
 }
 
-//Providing default an Event implementation
+//Providing default an Event implementation all event must have this EventModel
 type EventModel struct {
+
+	// ID of aggregate Root
 	AggregateID string
-	Version     int
-	Type        string
-	Time        time.Time
+
+	// Specifies the version of the event. Modify the version if the structure of the event changes.
+	Version int
+	Type    string
+	Time    time.Time
 }
 
 func (e EventModel) GetType() string {

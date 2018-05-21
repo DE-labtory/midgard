@@ -2,10 +2,9 @@ package rabbitmq
 
 import (
 	"encoding/json"
-
-	"reflect"
-
+	"errors"
 	"log"
+	"reflect"
 
 	"github.com/it-chain/eventsource"
 	"github.com/streadway/amqp"
@@ -45,7 +44,25 @@ func (c *Client) Close() {
 	c.conn.Close()
 }
 
-func (c *Client) Publish(exchange string, topic string, event eventsource.Event) error {
+func (c *Client) Publish(exchange string, topic string, event eventsource.Event) (err error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			// find out exactly what the error was and set err
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+	}()
+
+	if event.GetAggregateID() == "" {
+		return errors.New("no aggregate root ID")
+	}
 
 	ch, err := c.conn.Channel()
 
