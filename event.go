@@ -17,8 +17,10 @@ type EventModel struct {
 
 	// Specifies the version of the event. Modify the version if the structure of the event changes.
 	Version int
-	Type    string
-	Time    time.Time
+
+	// Specifies topic when published through publisher
+	Type string
+	Time time.Time
 }
 
 func (e EventModel) GetType() string {

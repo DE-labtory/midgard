@@ -6,18 +6,18 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/it-chain/eventsource"
+	"github.com/it-chain/eventsource/bus"
 	"github.com/streadway/amqp"
 )
 
-type EventMessage struct {
-	EventType string
-	Data      []byte
+type Message struct {
+	MatchingValue string
+	Data          []byte
 }
 
 type Client struct {
 	conn   *amqp.Connection
-	router eventsource.Router
+	router bus.Router
 }
 
 func Connect(rabbitmqUrl string) *Client {
@@ -32,7 +32,7 @@ func Connect(rabbitmqUrl string) *Client {
 		panic("Failed to connect to RabbitMQ" + err.Error())
 	}
 
-	p, _ := eventsource.NewParamBasedRouter()
+	p, _ := bus.NewParamBasedRouter()
 
 	return &Client{
 		conn:   conn,
@@ -44,7 +44,7 @@ func (c *Client) Close() {
 	c.conn.Close()
 }
 
-func (c *Client) Publish(exchange string, topic string, event eventsource.Event) (err error) {
+func (c *Client) Publish(exchange string, topic string, data interface{}) (err error) {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -59,10 +59,6 @@ func (c *Client) Publish(exchange string, topic string, event eventsource.Event)
 			}
 		}
 	}()
-
-	if event.GetAggregateID() == "" {
-		return errors.New("no aggregate root ID")
-	}
 
 	ch, err := c.conn.Channel()
 
@@ -86,14 +82,22 @@ func (c *Client) Publish(exchange string, topic string, event eventsource.Event)
 		return err
 	}
 
-	b, err := json.Marshal(event)
+	var matchingValue string
 
-	eventMessage := EventMessage{
-		EventType: reflect.TypeOf(event).Name(),
-		Data:      b,
+	if reflect.TypeOf(data).Kind() == reflect.Ptr {
+		matchingValue = reflect.TypeOf(data).Elem().Name()
+	} else {
+		matchingValue = reflect.TypeOf(data).Name()
 	}
 
-	data, err := json.Marshal(eventMessage)
+	b, err := json.Marshal(data)
+
+	message := Message{
+		MatchingValue: matchingValue,
+		Data:          b,
+	}
+
+	byte, err := json.Marshal(message)
 
 	if err != nil {
 		return err
@@ -110,7 +114,7 @@ func (c *Client) Publish(exchange string, topic string, event eventsource.Event)
 		false,    // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        data,
+			Body:        byte,
 		})
 
 	if err != nil {
@@ -183,9 +187,7 @@ func (c *Client) consume(exchange string, topic string) (<-chan amqp.Delivery, e
 	return msgs, nil
 }
 
-type Handler func(event eventsource.Event)
-
-func (c *Client) Consume(exchange string, topic string, source interface{}) error {
+func (c *Client) Subscribe(exchange string, topic string, source interface{}) error {
 
 	chanDelivery, err := c.consume(exchange, topic)
 
@@ -203,14 +205,14 @@ func (c *Client) Consume(exchange string, topic string, source interface{}) erro
 		for delivery := range chanDelivery {
 			data := delivery.Body
 
-			eventMessasge := &EventMessage{}
-			err := json.Unmarshal(data, eventMessasge)
+			message := &Message{}
+			err := json.Unmarshal(data, message)
 
 			if err != nil {
 				log.Print(err.Error())
 			}
 
-			c.router.Route(eventMessasge.Data, eventMessasge.EventType)
+			c.router.Route(message.Data, message.MatchingValue)
 		}
 	}()
 

@@ -1,14 +1,14 @@
 package eventsource
 
-type EventBus interface {
-	EventPublisher
-	EventSubscriber
+type Bus interface {
+	Publisher
+	Subscriber
 }
 
-type EventPublisher interface {
-	Publish(exchange string, topic string, event Event) error
+type Publisher interface {
+	Publish(exchange string, topic string, data interface{}) (err error)
 }
 
-type EventSubscriber interface {
-	Subscribe(topic string, event Event)
+type Subscriber interface {
+	Subscribe(exchange string, topic string, source interface{}) error
 }

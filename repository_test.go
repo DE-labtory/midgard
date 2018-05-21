@@ -1,4 +1,4 @@
-package repository_test
+package eventsource_test
 
 import (
 	"fmt"
@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/repository"
 	"github.com/it-chain/eventsource/store/leveldb"
 	"github.com/stretchr/testify/assert"
 )
@@ -54,26 +53,35 @@ func TestNewRepository(t *testing.T) {
 	defer os.RemoveAll(path)
 
 	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserCreated{}, UserUpdated{}))
-	r := repository.New(store)
+	r := eventsource.NewRepo(store, nil)
 
 	aggregateID := "123"
 
 	err := r.Save(aggregateID, UserCreated{
-		EventModel: eventsource.EventModel{AggregateID: aggregateID},
+		EventModel: eventsource.EventModel{
+			AggregateID: aggregateID,
+			Type:        "User",
+		},
 	})
 
 	assert.NoError(t, err)
 
 	err = r.Save(aggregateID, UserUpdated{
-		EventModel: eventsource.EventModel{AggregateID: aggregateID},
-		Name:       "jun",
+		EventModel: eventsource.EventModel{
+			AggregateID: aggregateID,
+			Type:        "User",
+		},
+		Name: "jun",
 	})
 
 	assert.NoError(t, err)
 
 	err = r.Save(aggregateID, UserUpdated{
-		EventModel: eventsource.EventModel{AggregateID: aggregateID},
-		Name:       "jun2",
+		EventModel: eventsource.EventModel{
+			AggregateID: aggregateID,
+			Type:        "User",
+		},
+		Name: "jun2",
 	})
 
 	assert.NoError(t, err)

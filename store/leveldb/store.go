@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"reflect"
-	"strings"
 	"sync"
 
+	"reflect"
+	"strings"
+
 	"github.com/it-chain/eventsource"
-	"github.com/it-chain/eventsource/store"
 	"github.com/it-chain/leveldb-wrapper"
 )
 
@@ -30,7 +30,7 @@ type Store struct {
 	serializer EventSerializer
 }
 
-func NewEventStore(path string, serializer EventSerializer) store.EventStore {
+func NewEventStore(path string, serializer EventSerializer) eventsource.EventStore {
 
 	db := leveldbwrapper.CreateNewDB(path)
 	db.Open()

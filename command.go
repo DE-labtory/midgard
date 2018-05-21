@@ -1,7 +1,7 @@
 package eventsource
 
 type Command interface {
-	AggregateID() string
+	GetAggregateID() string
 }
 
 type CommandModel struct {
