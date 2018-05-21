@@ -1,0 +1,2 @@
+# midgard
+Event sourcing library
