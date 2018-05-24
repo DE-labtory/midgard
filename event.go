@@ -4,8 +4,8 @@ import "time"
 
 //Event interface
 type Event interface {
+	Entity
 	GetType() string
-	GetAggregateID() string
 	GetVersion() int
 }
 
@@ -13,7 +13,7 @@ type Event interface {
 type EventModel struct {
 
 	// ID of aggregate Root
-	AggregateID string
+	ID string
 
 	// Specifies the version of the event. Modify the version if the structure of the event changes.
 	Version int
@@ -27,8 +27,8 @@ func (e EventModel) GetType() string {
 	return e.Type
 }
 
-func (e EventModel) GetAggregateID() string {
-	return e.AggregateID
+func (e EventModel) GetID() string {
+	return e.ID
 }
 
 func (e EventModel) GetVersion() int {

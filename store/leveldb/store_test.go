@@ -29,14 +29,14 @@ func TestNew(t *testing.T) {
 	aggregateID = "1"
 
 	events := []UserAddedEvent{
-		{Name: "jun", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
-		{Name: "jun2", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
-		{Name: "jun3", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun2", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "jun3", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
 	}
 
 	events2 := []UserAddedEvent{
-		{Name: "jun", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
-		{Name: "jun2", EventModel: midgard.EventModel{AggregateID: aggregateID, Time: time.Now().UTC(), Version: 2}},
+		{Name: "jun", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 2}},
+		{Name: "jun2", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 2}},
 	}
 
 	//when

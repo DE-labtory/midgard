@@ -25,7 +25,7 @@ func (u User) On(event midgard.Event) error {
 	switch v := event.(type) {
 
 	case *UserCreatedEvent:
-		u.AggregateID = v.AggregateID
+		u.ID = v.ID
 
 	case *UserNameUpdatedEvent:
 		u.Name = v.Name
@@ -68,12 +68,12 @@ func (u UserCommandHandler) UserCreate(command UserCreateCommand) {
 	events := make([]midgard.Event, 0)
 	events = append(events, UserCreatedEvent{
 		midgard.EventModel{
-			AggregateID: "123",
-			Type:        "User",
+			ID:   "123",
+			Type: "User",
 		},
 	})
 
-	err := u.eventRepository.Save(command.GetAggregateID(), events...)
+	err := u.eventRepository.Save(command.GetID(), events...)
 	if err != nil {
 		panic(err)
 	}
@@ -85,17 +85,17 @@ func (u UserCommandHandler) UserNameUpdate(command UserNameUpdateCommand) {
 
 	user := User{}
 
-	u.eventRepository.Load(user, command.AggregateID)
+	u.eventRepository.Load(user, command.ID)
 
 	events := make([]midgard.Event, 0)
 	events = append(events, UserNameUpdatedEvent{
 		midgard.EventModel{
-			AggregateID: "123",
-			Type:        "User",
+			ID:   "123",
+			Type: "User",
 		}, "Jun",
 	})
 
-	err := u.eventRepository.Save(command.GetAggregateID(), events...)
+	err := u.eventRepository.Save(command.GetID(), events...)
 
 	if err != nil {
 		panic(err)

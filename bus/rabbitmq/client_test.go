@@ -26,16 +26,16 @@ func TestConnect(t *testing.T) {
 	err = c.Publish("asd", "asd", UserNameUpdateEvent{
 		Name: "JUN",
 		EventModel: midgard.EventModel{
-			AggregateID: "123",
-			Time:        time.Now(),
-			Type:        "123",
-			Version:     1,
+			ID:      "123",
+			Time:    time.Now(),
+			Type:    "123",
+			Version: 1,
 		}})
 	assert.NoError(t, err)
 
 	err = c.Publish("asd", "asd", UserAddCommand{
 		CommandModel: midgard.CommandModel{
-			AggregateID: "123",
+			ID: "123",
 		}})
 
 	assert.NoError(t, err)
