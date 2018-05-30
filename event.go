@@ -23,6 +23,10 @@ type EventModel struct {
 	Time time.Time
 }
 
+func (e EventModel) GetId() string {
+	return e.AggregateID
+}
+
 func (e EventModel) GetType() string {
 	return e.Type
 }
