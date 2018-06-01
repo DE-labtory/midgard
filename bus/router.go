@@ -58,11 +58,11 @@ func (c *ParamBasedRouter) SetHandler(handler interface{}) error {
 		// Method panics if i is out of range or if v is a nil interface value.
 		method := sourceType.Method(i)
 
-		if method.Type.NumIn() != 2 {
+		if method.Type.NumIn() != 2 { // 핸들러 메소드의 인풋 파라미터가 2개가 아니면 error 반환
 			return errors.New("number of parameter of handler is not 2")
 		}
 
-		paramType := method.Type.In(1)
+		paramType := method.Type.In(1) //returns the type of a function type's i'th input parameter.
 
 		_, ok := c.handlerMap[paramType]
 
