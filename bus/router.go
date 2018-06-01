@@ -87,7 +87,6 @@ func createEventHandler(method reflect.Method, handler interface{}) func(interfa
 	}
 }
 
-// Route method 는 data 와 handler의 이름을 받아 해당 handler를 실행하는 method 이다.
 func (c ParamBasedRouter) Route(data []byte, structName string) (err error) {
 
 	defer func() {
