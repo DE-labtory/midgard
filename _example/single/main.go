@@ -49,12 +49,12 @@ func (u UserCommandHandler) UserCreated(command UserCreateCommand) {
 	events := make([]midgard.Event, 0)
 	events = append(events, UserCreatedEvent{
 		midgard.EventModel{
-			AggregateID: "123",
-			Type:        "User",
+			ID:   "123",
+			Type: "User",
 		},
 	})
 
-	err := u.eventRepository.Save(command.GetAggregateID(), events...)
+	err := u.eventRepository.Save(command.GetID(), events...)
 	if err != nil {
 		panic(err)
 	}

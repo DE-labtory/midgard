@@ -1,14 +1,14 @@
 package midgard
 
 type Command interface {
-	GetAggregateID() string
+	Entity
 }
 
 type CommandModel struct {
 	// ID contains the aggregate id
-	AggregateID string
+	ID string
 }
 
-func (c CommandModel) GetAggregateID() string {
-	return c.AggregateID
+func (c CommandModel) GetID() string {
+	return c.ID
 }

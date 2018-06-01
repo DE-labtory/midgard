@@ -28,7 +28,7 @@ func main() {
 
 		Name: "jun2",
 		CommandModel: midgard.CommandModel{
-			AggregateID: "123",
+			ID: "123",
 		},
 	})
 

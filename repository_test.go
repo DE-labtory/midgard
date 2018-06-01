@@ -24,7 +24,7 @@ func (u *UserAggregate) On(event midgard.Event) error {
 	switch v := event.(type) {
 
 	case *UserCreated:
-		u.AggregateID = v.AggregateID
+		u.ID = v.ID
 
 	case *UserUpdated:
 		u.Name = v.Name
@@ -59,8 +59,8 @@ func TestNewRepository(t *testing.T) {
 
 	err := r.Save(aggregateID, UserCreated{
 		EventModel: midgard.EventModel{
-			AggregateID: aggregateID,
-			Type:        "User",
+			ID:   aggregateID,
+			Type: "User",
 		},
 	})
 
@@ -68,8 +68,8 @@ func TestNewRepository(t *testing.T) {
 
 	err = r.Save(aggregateID, UserUpdated{
 		EventModel: midgard.EventModel{
-			AggregateID: aggregateID,
-			Type:        "User",
+			ID:   aggregateID,
+			Type: "User",
 		},
 		Name: "jun",
 	})
@@ -78,8 +78,8 @@ func TestNewRepository(t *testing.T) {
 
 	err = r.Save(aggregateID, UserUpdated{
 		EventModel: midgard.EventModel{
-			AggregateID: aggregateID,
-			Type:        "User",
+			ID:   aggregateID,
+			Type: "User",
 		},
 		Name: "jun2",
 	})
@@ -91,7 +91,7 @@ func TestNewRepository(t *testing.T) {
 	err = r.Load(user, aggregateID)
 	assert.NoError(t, err)
 
-	assert.Equal(t, user.AggregateID, aggregateID)
+	assert.Equal(t, user.ID, aggregateID)
 	assert.Equal(t, user.Name, "jun2")
 
 	fmt.Println(user)
