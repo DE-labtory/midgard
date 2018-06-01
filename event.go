@@ -23,6 +23,7 @@ type EventModel struct {
 	Time time.Time
 }
 
+
 func (e EventModel) GetType() string {
 	return e.Type
 }

@@ -187,9 +187,10 @@ func (c *Client) consume(exchange string, topic string) (<-chan amqp.Delivery, e
 	return msgs, nil
 }
 
+// 해당 exchange, topic을 구독 하고 source에서 처리한다.
 func (c *Client) Subscribe(exchange string, topic string, source interface{}) error {
 
-	chanDelivery, err := c.consume(exchange, topic)
+	chanDelivery, err := c.consume(exchange, topic) //해당 채널과 토픽에서 consume
 
 	if err != nil {
 		return err
@@ -212,7 +213,7 @@ func (c *Client) Subscribe(exchange string, topic string, source interface{}) er
 				log.Print(err.Error())
 			}
 
-			c.router.Route(message.Data, message.MatchingValue)
+			c.router.Route(message.Data, message.MatchingValue) //해당 event를 처리하기 위한 matching value 에는 structName이 들어간다.
 		}
 	}()
 

@@ -47,16 +47,22 @@ func (c *ParamBasedRouter) SetHandler(handler interface{}) error {
 	}
 
 	sourceType := reflect.TypeOf(handler)
-	methodCount := sourceType.NumMethod()
+	methodCount := sourceType.NumMethod() // NumMethod returns the number of exported methods in the value's method set.
 
+	// executes every method if handler interface
 	for i := 0; i < methodCount; i++ {
+
+		// Method returns a function value corresponding to v's i'th method.
+		// The arguments to a Call on the returned function should not include a receiver;
+		// the returned function will always use v as the receiver.
+		// Method panics if i is out of range or if v is a nil interface value.
 		method := sourceType.Method(i)
 
-		if method.Type.NumIn() != 2 {
+		if method.Type.NumIn() != 2 { // 핸들러 메소드의 인풋 파라미터가 2개가 아니면 error 반환
 			return errors.New("number of parameter of handler is not 2")
 		}
 
-		paramType := method.Type.In(1)
+		paramType := method.Type.In(1) //returns the type of a function type's i'th input parameter.
 
 		_, ok := c.handlerMap[paramType]
 
@@ -115,12 +121,12 @@ func (c ParamBasedRouter) Route(data []byte, structName string) (err error) {
 
 	paramValue := reflect.ValueOf(paramInterface).Elem().Interface()
 
-	handler(paramValue)
+	handler(paramValue) //execute handler
 
 	return nil
 }
 
-//find target struct by struct name
+//find type of handler by struct name
 func (c ParamBasedRouter) findTypeOfHandler(typeName string) (reflect.Type, func(param interface{}), error) {
 
 	for paramType, handler := range c.handlerMap {
