@@ -47,9 +47,15 @@ func (c *ParamBasedRouter) SetHandler(handler interface{}) error {
 	}
 
 	sourceType := reflect.TypeOf(handler)
-	methodCount := sourceType.NumMethod()
+	methodCount := sourceType.NumMethod() // NumMethod returns the number of exported methods in the value's method set.
 
+	// executes every method if handler interface
 	for i := 0; i < methodCount; i++ {
+
+		// Method returns a function value corresponding to v's i'th method.
+		// The arguments to a Call on the returned function should not include a receiver;
+		// the returned function will always use v as the receiver.
+		// Method panics if i is out of range or if v is a nil interface value.
 		method := sourceType.Method(i)
 
 		if method.Type.NumIn() != 2 {
