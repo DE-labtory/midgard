@@ -49,7 +49,7 @@ func (c *ParamBasedRouter) SetHandler(handler interface{}) error {
 	sourceType := reflect.TypeOf(handler)
 	methodCount := sourceType.NumMethod() // NumMethod returns the number of exported methods in the value's method set.
 
-	// executes every method if handler interface
+	// register every method that has only one input parameter to the handlerMap
 	for i := 0; i < methodCount; i++ {
 
 		// Method returns a function value corresponding to v's i'th method.
@@ -58,7 +58,9 @@ func (c *ParamBasedRouter) SetHandler(handler interface{}) error {
 		// Method panics if i is out of range or if v is a nil interface value.
 		method := sourceType.Method(i)
 
-		if method.Type.NumIn() != 2 { // 핸들러 메소드의 인풋 파라미터가 2개가 아니면 error 반환
+		// 핸들러 메소드의 인풋 파라미터가 1개가 아니면 에러 반환
+		// 객체의 함수는 기본 인풋으로 자기 자신이 들어오기 때문에 인자가 최소 하나가 있다.
+		if method.Type.NumIn() != 2 {
 			return errors.New("number of parameter of handler is not 2")
 		}
 
@@ -66,17 +68,22 @@ func (c *ParamBasedRouter) SetHandler(handler interface{}) error {
 
 		_, ok := c.handlerMap[paramType]
 
+		// 핸들러맵에 이미 동일 파라미터가 등록되 있는 경우 에러 반환
 		if ok {
 			return errors.New(fmt.Sprintf("same param already exist [%s]", paramType))
 		}
 
+
 		handler := createEventHandler(method, handler)
+
+		// 핸들러맵에 핸들러 매소드 등록
 		c.handlerMap[paramType] = handler
 	}
 
 	return nil
 }
 
+// 핸들러의 특정 메소드의 입력으로 핸들러 자체와 파라미터인자를 받아 처리하는 핸들러 반환
 func createEventHandler(method reflect.Method, handler interface{}) func(interface{}) {
 	return func(param interface{}) {
 		sourceValue := reflect.ValueOf(handler)

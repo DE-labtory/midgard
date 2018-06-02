@@ -1,6 +1,9 @@
 # midgard
 Event sourcing library
 
+## Basic Design
+<p align="center"><img src="./images/MidgardDesignModel.png" width="171px" height="171px"></p>
+
 ## usage
 
 ```Go
@@ -31,11 +34,11 @@ Client는 발생한 이벤트의 핸들러를 지정할 뿐만 아니라 해당 
 라우터는 data 와 handler의 이름을 받아 해당 handler를 실행한다.
 
 ### SetHandler(handler interface{}) error
-  handler should be a struct pointer which has handler method
-  this function not only set handler to the router so that handler can handle but also executes it.
-  every method in handler interface will be executed.
-  
+handler should be a struct pointer which has handler method
+this method register every method for event in HandlerMap so than when router is called, specific handler method deals with it.
+
 ### Route(data []byte, structName string) (err error)
+`Route` calls specific handler function in handler map with handler struct name
 
 
 
