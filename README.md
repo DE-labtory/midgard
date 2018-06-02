@@ -1,7 +1,7 @@
 # midgard
 Event sourcing library
 
-## Basic Design
+## Bus Operation
 <p align="center"><img src="./images/MidgardDesignModel.png" width="171px" height="171px"></p>
 
 ## usage
