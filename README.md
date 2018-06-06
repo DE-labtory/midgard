@@ -2,7 +2,7 @@
 Event sourcing library
 
 ## Bus Operation
-<p align="center"><img src="./images/MidgardDesignModel.png" width="171px" height="171px"></p>
+![Midgard Design Model](./images/MidgardDesignModel.png)
 
 ## usage
 
