@@ -1,14 +1,15 @@
 package mongodb
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
-	"github.com/it-chain/midgard"
-	"gopkg.in/mgo.v2"
-	"time"
-	"gopkg.in/mgo.v2/bson"
 	"errors"
+	"testing"
+	"time"
+
+	"github.com/it-chain/midgard"
 	"github.com/it-chain/midgard/store"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type UserAddedEvent struct {
@@ -24,10 +25,11 @@ func TestNewEventStore(t *testing.T) {
 	defer dropDB(path, dbname)
 
 	// When
-	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	store, err := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
 
 	// then
-	assert.NotEqual(t, store, nil)
+	assert.NotNil(t, store)
+	assert.Nil(t, err)
 
 }
 
@@ -37,10 +39,10 @@ func TestNewEventStore_WrongPath(t *testing.T) {
 	dbname := "test"
 
 	// When
-	store := NewEventStore(wrongpath, dbname, store.NewSerializer(UserAddedEvent{}))
+	_, err := NewEventStore(wrongpath, dbname, store.NewSerializer(UserAddedEvent{}))
 
 	// Then
-	assert.Equal(t, store, nil)
+	assert.Error(t, err)
 }
 
 func TestStore_Save(t *testing.T) {
@@ -54,7 +56,8 @@ func TestStore_Save(t *testing.T) {
 		session.Close()
 	}()
 
-	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	store, err := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	assert.NoError(t, err)
 
 	document := Document{}
 	var aggregateID string
@@ -79,7 +82,6 @@ func TestStore_Save(t *testing.T) {
 	assert.Equal(t, 3, len(document.History))
 	assert.Equal(t, "1", document.AggregateID)
 
-
 	// When
 	events2 := []UserAddedEvent{
 		{Name: "jun", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 2}},
@@ -96,7 +98,6 @@ func TestStore_Save(t *testing.T) {
 	// Then
 	assert.Equal(t, 5, len(document.History))
 	assert.Equal(t, "1", document.AggregateID)
-
 }
 
 func TestStore_Load(t *testing.T) {
@@ -106,7 +107,8 @@ func TestStore_Load(t *testing.T) {
 
 	defer dropDB(path, dbname)
 
-	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	store, err := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	assert.NoError(t, err)
 
 	var aggregateID string
 	aggregateID = "1"
@@ -125,6 +127,9 @@ func TestStore_Load(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 3, len(Events))
 	assert.Equal(t, aggregateID, Events[0].GetID())
+
+	userAddedEvent := Events[0].(*UserAddedEvent)
+	assert.Equal(t, "zf1", userAddedEvent.Name)
 }
 
 func TestStore_Load_NoMatchingDocument(t *testing.T) {
@@ -134,13 +139,14 @@ func TestStore_Load_NoMatchingDocument(t *testing.T) {
 
 	defer dropDB(path, dbname)
 
-	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	store, err := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	assert.NoError(t, err)
 
 	var aggregateID string
 	aggregateID = "1"
 
 	// When
-	_, err := store.Load(aggregateID)
+	_, err = store.Load(aggregateID)
 	// Then
 	assert.Equal(t, errors.New("not found"), err)
 }
@@ -166,5 +172,3 @@ func ToEvent(event ...UserAddedEvent) []midgard.Event {
 	}
 	return intf
 }
-
-

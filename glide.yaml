@@ -5,3 +5,4 @@ import:
 - package: github.com/stretchr/testify
   version: v1.2.1
 - package: github.com/streadway/amqp
+- package: gopkg.in/mgo.v2

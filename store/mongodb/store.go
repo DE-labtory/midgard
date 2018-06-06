@@ -1,19 +1,19 @@
 package mongodb
 
 import (
-	"gopkg.in/mgo.v2"
-	"github.com/it-chain/midgard"
 	"sync"
-	"gopkg.in/mgo.v2/bson"
-	"github.com/it-chain/midgard/store"
-)
 
+	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/store"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
 
 type History []store.SerializedEvent
 
 type Document struct {
-	AggregateID string 			`bson:"aggregate_id"`
-	History 					`bson:"history"`
+	AggregateID string `bson:"aggregate_id"`
+	History     `bson:"history"`
 }
 
 func (d *Document) appendEvent(serializedEvent store.SerializedEvent) {
@@ -26,31 +26,32 @@ func (d *Document) getHistory() History {
 
 type Store struct {
 	name string
-	mux *sync.RWMutex
+	mux  *sync.RWMutex
 	*mgo.Session
 	mgo.Index
 	serializer store.EventSerializer
 }
 
-func NewEventStore(path string, db string, serializer store.EventSerializer) midgard.EventStore {
-	s, err := mgo.Dial(path)
+func NewEventStore(url string, db string, serializer store.EventSerializer) (midgard.EventStore, error) {
+	s, err := mgo.Dial(url)
 
 	if err != nil {
-		return nil
+		return nil, err
 	}
+
 	return &Store{
-		name: db,
-		mux: &sync.RWMutex{},
-		Session: s,
+		name:       db,
+		mux:        &sync.RWMutex{},
+		Session:    s,
 		serializer: serializer,
 		Index: mgo.Index{
-			Key:        []string{"aggregate_id"},
-			Unique:     true, 		// Prevent two documents from having the same index key
+			Key:    []string{"aggregate_id"},
+			Unique: true, // Prevent two documents from having the same index key
 			// DropDups:   false, 	// Drop documents with the same index key as a previously indexed one
-			Background: true, 		// Build index in background and return immediately
-			Sparse:     true, 		// Only index documents containing the Key fields
+			Background: true, // Build index in background and return immediately
+			Sparse:     true, // Only index documents containing the Key fields
 		},
-	}
+	}, nil
 
 }
 
@@ -69,7 +70,7 @@ func (s Store) Save(aggregateID string, events ...midgard.Event) error {
 	if err != nil {
 		document = &Document{
 			AggregateID: aggregateID,
-			History: []store.SerializedEvent{},
+			History:     []store.SerializedEvent{},
 		}
 	}
 
@@ -133,4 +134,3 @@ func (s Store) getDocument(aggregateID string) (*Document, error) {
 func (s Store) getFreshSession() *mgo.Session {
 	return s.Session.Copy()
 }
-
