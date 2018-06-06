@@ -6,8 +6,6 @@ import (
 	"sync"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/it-chain/midgard/store"
-	"reflect"
-	"strings"
 )
 
 
@@ -136,15 +134,3 @@ func (s Store) getFreshSession() *mgo.Session {
 	return s.Session.Copy()
 }
 
-func GetTypeName(source interface{}) (reflect.Type, string) {
-
-	rawType := reflect.TypeOf(source)
-
-	if rawType.Kind() == reflect.Ptr {
-		rawType = rawType.Elem()
-	}
-
-	name := rawType.String()
-	parts := strings.Split(name, ".")
-	return rawType, parts[1]
-}

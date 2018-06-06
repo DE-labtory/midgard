@@ -80,3 +80,16 @@ func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (midgard.Eve
 
 	return v.(midgard.Event), nil
 }
+
+func GetTypeName(source interface{}) (reflect.Type, string) {
+
+	rawType := reflect.TypeOf(source)
+
+	if rawType.Kind() == reflect.Ptr {
+		rawType = rawType.Elem()
+	}
+
+	name := rawType.String()
+	parts := strings.Split(name, ".")
+	return rawType, parts[1]
+}
