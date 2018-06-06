@@ -10,6 +10,9 @@ import (
 	"github.com/it-chain/midgard"
 	"github.com/it-chain/midgard/store/leveldb"
 	"github.com/stretchr/testify/assert"
+	"github.com/it-chain/midgard/store"
+	"reflect"
+	"strings"
 )
 
 type UserAddedEvent struct {
@@ -21,7 +24,7 @@ func TestNew(t *testing.T) {
 
 	//given
 	path := "test"
-	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserAddedEvent{}))
+	store := leveldb.NewEventStore(path, store.NewSerializer(UserAddedEvent{}))
 	defer os.RemoveAll(path)
 
 	var aggregateID string
@@ -80,4 +83,17 @@ func ToUserAddedEvent(t *testing.T, events ...midgard.Event) []UserAddedEvent {
 	}
 
 	return uae
+}
+
+func GetTypeName(source interface{}) (reflect.Type, string) {
+
+	rawType := reflect.TypeOf(source)
+
+	if rawType.Kind() == reflect.Ptr {
+		rawType = rawType.Elem()
+	}
+
+	name := rawType.String()
+	parts := strings.Split(name, ".")
+	return rawType, parts[1]
 }
