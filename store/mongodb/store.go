@@ -4,29 +4,21 @@ import (
 	"gopkg.in/mgo.v2"
 	"github.com/it-chain/midgard"
 	"sync"
-	"fmt"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/it-chain/midgard/store"
 	"reflect"
-	"encoding/json"
 	"strings"
-	"errors"
 )
 
-var ErrNilEvents = errors.New("no event history exist")
 
-type SerializedEvent struct {
-	Type string
-	Data []byte
-}
-
-type History []SerializedEvent
+type History []store.SerializedEvent
 
 type Document struct {
 	AggregateID string 			`bson:"aggregate_id"`
 	History 					`bson:"history"`
 }
 
-func (d *Document) appendEvent(serializedEvent SerializedEvent) {
+func (d *Document) appendEvent(serializedEvent store.SerializedEvent) {
 	d.History = append(d.History, serializedEvent)
 }
 
@@ -39,10 +31,10 @@ type Store struct {
 	mux *sync.RWMutex
 	*mgo.Session
 	mgo.Index
-	serializer EventSerializer
+	serializer store.EventSerializer
 }
 
-func NewEventStore(path string, db string, serializer EventSerializer) midgard.EventStore {
+func NewEventStore(path string, db string, serializer store.EventSerializer) midgard.EventStore {
 	s, err := mgo.Dial(path)
 
 	if err != nil {
@@ -79,7 +71,7 @@ func (s Store) Save(aggregateID string, events ...midgard.Event) error {
 	if err != nil {
 		document = &Document{
 			AggregateID: aggregateID,
-			History: []SerializedEvent{},
+			History: []store.SerializedEvent{},
 		}
 	}
 
@@ -142,72 +134,6 @@ func (s Store) getDocument(aggregateID string) (*Document, error) {
 // open another session from the database pool
 func (s Store) getFreshSession() *mgo.Session {
 	return s.Session.Copy()
-}
-
-type EventSerializer interface {
-	// MarshalEvent converts an Event to a Record
-	Marshal(event midgard.Event) (SerializedEvent, error)
-
-	// UnmarshalEvent converts an Event backed into a Record
-	Unmarshal(serializedEvent SerializedEvent) (midgard.Event, error)
-}
-
-type JSONSerializer struct {
-	eventTypes map[string]reflect.Type
-}
-
-func NewSerializer(events ...midgard.Event) EventSerializer {
-
-	s := &JSONSerializer{
-		eventTypes: make(map[string]reflect.Type),
-	}
-
-	s.Register(events...)
-
-	return s
-}
-
-func (j *JSONSerializer) Register(events ...midgard.Event) {
-
-	for _, event := range events {
-		rawType, name := GetTypeName(event)
-		j.eventTypes[name] = rawType
-	}
-}
-
-func (j *JSONSerializer) Marshal(e midgard.Event) (SerializedEvent, error) {
-
-	serializedEvent := SerializedEvent{}
-	_, name := GetTypeName(e)
-	serializedEvent.Type = name
-
-	data, err := json.Marshal(e)
-
-	if err != nil {
-		return SerializedEvent{}, err
-	}
-
-	serializedEvent.Data = data
-
-	return serializedEvent, nil
-}
-
-func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (midgard.Event, error) {
-
-	t, ok := j.eventTypes[serializedEvent.Type]
-
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("unbound event type, %v", serializedEvent.Type))
-	}
-
-	v := reflect.New(t).Interface()
-
-	err := json.Unmarshal(serializedEvent.Data, v)
-	if err != nil {
-		return nil, err
-	}
-
-	return v.(midgard.Event), nil
 }
 
 func GetTypeName(source interface{}) (reflect.Type, string) {

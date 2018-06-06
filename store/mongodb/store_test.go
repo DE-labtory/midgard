@@ -8,6 +8,7 @@ import (
 	"time"
 	"gopkg.in/mgo.v2/bson"
 	"errors"
+	"github.com/it-chain/midgard/store"
 )
 
 type UserAddedEvent struct {
@@ -23,7 +24,7 @@ func TestNewEventStore(t *testing.T) {
 	defer dropDB(path, dbname)
 
 	// When
-	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
+	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
 
 	// then
 	assert.NotEqual(t, store, nil)
@@ -36,7 +37,7 @@ func TestNewEventStore_WrongPath(t *testing.T) {
 	dbname := "test"
 
 	// When
-	store := NewEventStore(wrongpath, dbname, NewSerializer(UserAddedEvent{}))
+	store := NewEventStore(wrongpath, dbname, store.NewSerializer(UserAddedEvent{}))
 
 	// Then
 	assert.Equal(t, store, nil)
@@ -53,7 +54,7 @@ func TestStore_Save(t *testing.T) {
 		session.Close()
 	}()
 
-	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
+	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
 
 	document := Document{}
 	var aggregateID string
@@ -105,7 +106,7 @@ func TestStore_Load(t *testing.T) {
 
 	defer dropDB(path, dbname)
 
-	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
+	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
 
 	var aggregateID string
 	aggregateID = "1"
@@ -133,14 +134,13 @@ func TestStore_Load_NoMatchingDocument(t *testing.T) {
 
 	defer dropDB(path, dbname)
 
-	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
+	store := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
 
 	var aggregateID string
 	aggregateID = "1"
 
 	// When
 	_, err := store.Load(aggregateID)
-
 	// Then
 	assert.Equal(t, errors.New("not found"), err)
 }
