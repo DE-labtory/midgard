@@ -51,7 +51,7 @@ func TestStore_Save(t *testing.T) {
 	session, _ := mgo.Dial(path)
 	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
 
-	history := History{}
+	document := Document{}
 	var aggregateID string
 	aggregateID = "1"
 
@@ -68,11 +68,11 @@ func TestStore_Save(t *testing.T) {
 	assert.Equal(t, nil, saveErr)
 
 	// When
-	session.DB(dbname).C("events").Find(bson.M{"aggregate_id": aggregateID}).One(&history)
+	session.DB(dbname).C("events").Find(bson.M{"aggregate_id": aggregateID}).One(&document)
 
 	// Then
-	assert.Equal(t, 3, len(history.Events))
-	assert.Equal(t, "1", history.AggregateID)
+	assert.Equal(t, 3, len(document.History))
+	assert.Equal(t, "1", document.AggregateID)
 
 
 	// When
@@ -86,11 +86,11 @@ func TestStore_Save(t *testing.T) {
 	assert.Equal(t, nil, saveErr2)
 
 	// When
-	session.DB(dbname).C("events").Find(bson.M{"aggregate_id": aggregateID}).One(&history)
+	session.DB(dbname).C("events").Find(bson.M{"aggregate_id": aggregateID}).One(&document)
 
 	// Then
-	assert.Equal(t, 5, len(history.Events))
-	assert.Equal(t, "1", history.AggregateID)
+	assert.Equal(t, 5, len(document.History))
+	assert.Equal(t, "1", document.AggregateID)
 
 }
 
@@ -117,13 +117,4 @@ func ToEvent(event ...UserAddedEvent) []midgard.Event {
 	return intf
 }
 
-//func ToUserAddedEvent(events ...midgard.Event) []UserAddedEvent {
-//	uae := make([]UserAddedEvent, 0)
-//	for _, v := range events {
-//		userAddedEvent := v.(*UserAddedEvent)
-//		uae = append(uae, *userAddedEvent)
-//	}
-//
-//	return uae
-//}
 

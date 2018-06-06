@@ -12,18 +12,26 @@ import (
 	"errors"
 )
 
+var ErrNilEvents = errors.New("no event history exist")
+
 type SerializedEvent struct {
 	Type string
 	Data []byte
 }
 
-type History  struct {
+type History []SerializedEvent
+
+type Document struct {
 	AggregateID string 			`bson:"aggregate_id"`
-	Events []SerializedEvent 	`bson:"events"`
+	History 					`bson:"history"`
 }
 
-func (h *History) appendEvent(serializedEvent SerializedEvent) {
-	h.Events = append(h.Events, serializedEvent)
+func (d *Document) appendEvent(serializedEvent SerializedEvent) {
+	d.History = append(d.History, serializedEvent)
+}
+
+func (d *Document) getHistory() History {
+	return d.History
 }
 
 type Store struct {
@@ -60,17 +68,18 @@ func NewEventStore(path string, db string, serializer EventSerializer) midgard.E
 func (s Store) Save(aggregateID string, events ...midgard.Event) error {
 	s.mux.Lock()
 	session := s.getFreshSession()
+
 	defer func() {
 		s.mux.Unlock()
 		session.Close()
 	}()
 
-	history, err := s.getHistory(aggregateID)
+	document, err := s.getDocument(aggregateID)
 
 	if err != nil {
-		history = &History{
+		document = &Document{
 			AggregateID: aggregateID,
-			Events: []SerializedEvent{},
+			History: []SerializedEvent{},
 		}
 	}
 
@@ -79,13 +88,13 @@ func (s Store) Save(aggregateID string, events ...midgard.Event) error {
 		if err != nil {
 			return err
 		}
-		history.appendEvent(serializedEvent)
+		document.appendEvent(serializedEvent)
 	}
 
 	c := session.DB(s.name).C("events")
 	c.EnsureIndex(s.Index)
 
-	_, err = c.Upsert(bson.M{"aggregate_id": aggregateID}, history)
+	_, err = c.Upsert(bson.M{"aggregate_id": aggregateID}, document)
 	return err
 }
 
@@ -99,16 +108,38 @@ func (s Store) Load(aggregateID string) ([]midgard.Event, error) {
 		session.Close()
 	}()
 
-	return nil, nil
+	document, err := s.getDocument(aggregateID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if document == nil {
+		return nil, ErrNilEvents
+	}
+
+	events := make([]midgard.Event, 0)
+
+	for _, v := range document.getHistory() {
+		event, err := s.serializer.Unmarshal(v)
+
+		if err != nil {
+			return []midgard.Event{}, err
+		}
+
+		events = append(events, event)
+	}
+
+	return events, nil
 }
 
-func (s Store) getHistory(aggregateID string) (*History, error) {
-	var history = History{}
+func (s Store) getDocument(aggregateID string) (*Document, error) {
+	var document = Document{}
 
 	c := s.Session.DB(s.name).C("events")
-	err := c.Find(bson.M{"aggregate_id": aggregateID}).One(&history)
+	err := c.Find(bson.M{"aggregate_id": aggregateID}).One(&document)
 
-	return &history, err
+	return &document, err
 }
 
 // When do multithreaded work, we want to be thread-safe
