@@ -3,25 +3,45 @@ package mongodb
 import (
 	"gopkg.in/mgo.v2"
 	"github.com/it-chain/midgard"
-	"log"
 	"sync"
+	"fmt"
+	"gopkg.in/mgo.v2/bson"
 )
 
-type Store struct {
-	mux *sync.RWMutex
-	*mgo.Session
+type SerializedEvent struct {
+	Type string
+	Data []byte
 }
 
-func NewEventStore(path string) midgard.EventStore {
+type History  struct {
+	AggregateID string 			`bson:"aggrgate_id"`
+	Events []SerializedEvent 	`bson:"events"`
+}
+
+type Store struct {
+	name string
+	mux *sync.RWMutex
+	*mgo.Session
+	mgo.Index
+}
+
+func NewEventStore(path string, name string) midgard.EventStore {
 	s, err := mgo.Dial(path)
 
 	if err != nil {
-		log.Fatal(err)
 		return nil
 	}
 	return &Store{
-		Session: s,
+		name: name,
 		mux: &sync.RWMutex{},
+		Session: s,
+		Index: mgo.Index{
+			Key:        []string{"ID"},
+			Unique:     false, 		// Prevent two documents from having the same index key
+			// DropDups:   false, 	// Drop documents with the same index key as a previously indexed one
+			Background: true, 		// Build index in background and return immediately
+			Sparse:     true, 		// Only index documents containing the Key fields
+		},
 	}
 
 }
@@ -36,9 +56,14 @@ func (s Store) Save(aggregateID string, events ...midgard.Event) error {
 		session.Close()
 	}()
 
-	c := session.DB("midgard").C("events");
+	c := session.DB(s.name).C("events");
+	err := c.EnsureIndex(s.Index)
+	if err != nil {
+		return err
+	}
 
 	for _, event := range events {
+		fmt.Println(event)
 		err := c.Insert(event)
 
 		if err != nil {
@@ -62,7 +87,16 @@ func (s Store) Load(aggregateID string) ([]midgard.Event, error) {
 	return nil, nil
 }
 
-// When we do multithreaded work, we want to be thread-safe
+func (s Store) getHistory(aggregateID string) (*History, error) {
+	var history = History{}
+
+	c := s.Session.DB(s.name).C("events")
+	err := c.Find(bson.M{"aggregate_id": aggregateID}).One(&history)
+
+	return &history, err
+}
+
+// When do multithreaded work, we want to be thread-safe
 // open another session from the database pool
 func (s Store) getFreshSession() *mgo.Session {
 	return s.Session.Copy()
