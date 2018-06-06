@@ -6,6 +6,10 @@ import (
 	"sync"
 	"fmt"
 	"gopkg.in/mgo.v2/bson"
+	"reflect"
+	"encoding/json"
+	"strings"
+	"errors"
 )
 
 type SerializedEvent struct {
@@ -14,8 +18,12 @@ type SerializedEvent struct {
 }
 
 type History  struct {
-	AggregateID string 			`bson:"aggrgate_id"`
+	AggregateID string 			`bson:"aggregate_id"`
 	Events []SerializedEvent 	`bson:"events"`
+}
+
+func (h *History) appendEvent(serializedEvent SerializedEvent) {
+	h.Events = append(h.Events, serializedEvent)
 }
 
 type Store struct {
@@ -23,21 +31,23 @@ type Store struct {
 	mux *sync.RWMutex
 	*mgo.Session
 	mgo.Index
+	serializer EventSerializer
 }
 
-func NewEventStore(path string, name string) midgard.EventStore {
+func NewEventStore(path string, db string, serializer EventSerializer) midgard.EventStore {
 	s, err := mgo.Dial(path)
 
 	if err != nil {
 		return nil
 	}
 	return &Store{
-		name: name,
+		name: db,
 		mux: &sync.RWMutex{},
 		Session: s,
+		serializer: serializer,
 		Index: mgo.Index{
-			Key:        []string{"ID"},
-			Unique:     false, 		// Prevent two documents from having the same index key
+			Key:        []string{"aggregate_id"},
+			Unique:     true, 		// Prevent two documents from having the same index key
 			// DropDups:   false, 	// Drop documents with the same index key as a previously indexed one
 			Background: true, 		// Build index in background and return immediately
 			Sparse:     true, 		// Only index documents containing the Key fields
@@ -50,28 +60,33 @@ func NewEventStore(path string, name string) midgard.EventStore {
 func (s Store) Save(aggregateID string, events ...midgard.Event) error {
 	s.mux.Lock()
 	session := s.getFreshSession()
-
 	defer func() {
 		s.mux.Unlock()
 		session.Close()
 	}()
 
-	c := session.DB(s.name).C("events");
-	err := c.EnsureIndex(s.Index)
+	history, err := s.getHistory(aggregateID)
+
 	if err != nil {
-		return err
-	}
-
-	for _, event := range events {
-		fmt.Println(event)
-		err := c.Insert(event)
-
-		if err != nil {
-			return err
+		history = &History{
+			AggregateID: aggregateID,
+			Events: []SerializedEvent{},
 		}
 	}
 
-	return nil
+	for _, event := range events {
+		serializedEvent, err := s.serializer.Marshal(event)
+		if err != nil {
+			return err
+		}
+		history.appendEvent(serializedEvent)
+	}
+
+	c := session.DB(s.name).C("events")
+	c.EnsureIndex(s.Index)
+
+	_, err = c.Upsert(bson.M{"aggregate_id": aggregateID}, history)
+	return err
 }
 
 //Load Aggregate Event from leveldb
@@ -100,4 +115,83 @@ func (s Store) getHistory(aggregateID string) (*History, error) {
 // open another session from the database pool
 func (s Store) getFreshSession() *mgo.Session {
 	return s.Session.Copy()
+}
+
+type EventSerializer interface {
+	// MarshalEvent converts an Event to a Record
+	Marshal(event midgard.Event) (SerializedEvent, error)
+
+	// UnmarshalEvent converts an Event backed into a Record
+	Unmarshal(serializedEvent SerializedEvent) (midgard.Event, error)
+}
+
+type JSONSerializer struct {
+	eventTypes map[string]reflect.Type
+}
+
+func NewSerializer(events ...midgard.Event) EventSerializer {
+
+	s := &JSONSerializer{
+		eventTypes: make(map[string]reflect.Type),
+	}
+
+	s.Register(events...)
+
+	return s
+}
+
+func (j *JSONSerializer) Register(events ...midgard.Event) {
+
+	for _, event := range events {
+		rawType, name := GetTypeName(event)
+		j.eventTypes[name] = rawType
+	}
+}
+
+func (j *JSONSerializer) Marshal(e midgard.Event) (SerializedEvent, error) {
+
+	serializedEvent := SerializedEvent{}
+	_, name := GetTypeName(e)
+	serializedEvent.Type = name
+
+	data, err := json.Marshal(e)
+
+	if err != nil {
+		return SerializedEvent{}, err
+	}
+
+	serializedEvent.Data = data
+
+	return serializedEvent, nil
+}
+
+func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (midgard.Event, error) {
+
+	t, ok := j.eventTypes[serializedEvent.Type]
+
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("unbound event type, %v", serializedEvent.Type))
+	}
+
+	v := reflect.New(t).Interface()
+
+	err := json.Unmarshal(serializedEvent.Data, v)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.(midgard.Event), nil
+}
+
+func GetTypeName(source interface{}) (reflect.Type, string) {
+
+	rawType := reflect.TypeOf(source)
+
+	if rawType.Kind() == reflect.Ptr {
+		rawType = rawType.Elem()
+	}
+
+	name := rawType.String()
+	parts := strings.Split(name, ".")
+	return rawType, parts[1]
 }
