@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"time"
 	"gopkg.in/mgo.v2/bson"
+	"errors"
 )
 
 type UserAddedEvent struct {
@@ -45,10 +46,13 @@ func TestStore_Save(t *testing.T) {
 	// given
 	path := "mongodb://localhost:27017"
 	dbname := "test"
-
-	defer dropDB(path, dbname)
-
 	session, _ := mgo.Dial(path)
+
+	defer func() {
+		dropDB(path, dbname)
+		session.Close()
+	}()
+
 	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
 
 	document := Document{}
@@ -94,6 +98,52 @@ func TestStore_Save(t *testing.T) {
 
 }
 
+func TestStore_Load(t *testing.T) {
+	// given
+	path := "mongodb://localhost:27017"
+	dbname := "test"
+
+	defer dropDB(path, dbname)
+
+	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
+
+	var aggregateID string
+	aggregateID = "1"
+
+	events := []UserAddedEvent{
+		{Name: "zf1", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "zf2", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "zf3", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+	}
+
+	// When
+	store.Save(aggregateID, ToEvent(events...)...)
+	Events, err := store.Load(aggregateID)
+
+	// Then
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 3, len(Events))
+	assert.Equal(t, aggregateID, Events[0].GetID())
+}
+
+func TestStore_Load_NoMatchingDocument(t *testing.T) {
+	// given
+	path := "mongodb://localhost:27017"
+	dbname := "test"
+
+	defer dropDB(path, dbname)
+
+	store := NewEventStore(path, dbname, NewSerializer(UserAddedEvent{}))
+
+	var aggregateID string
+	aggregateID = "1"
+
+	// When
+	_, err := store.Load(aggregateID)
+
+	// Then
+	assert.Equal(t, errors.New("not found"), err)
+}
 
 func dropDB(path string, dbname string) {
 	session, _ := mgo.Dial(path)

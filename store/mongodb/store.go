@@ -114,10 +114,6 @@ func (s Store) Load(aggregateID string) ([]midgard.Event, error) {
 		return nil, err
 	}
 
-	if document == nil {
-		return nil, ErrNilEvents
-	}
-
 	events := make([]midgard.Event, 0)
 
 	for _, v := range document.getHistory() {
