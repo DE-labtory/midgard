@@ -7,6 +7,11 @@ import (
 var ErrInvaildAggregateID = errors.New("aggregate id is empty")
 var ErrNilAggregate = errors.New("aggregate is nil")
 
+type EventRepository interface {
+	Load(aggregate Aggregate, aggregateID string) error
+	Save(aggregateID string, events ...Event) error
+}
+
 type EventPublisher interface {
 	Publisher
 }
