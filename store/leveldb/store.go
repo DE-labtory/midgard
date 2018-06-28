@@ -14,7 +14,6 @@ import (
 var ErrNilEvents = errors.New("no event history exist")
 var ErrGetValue = errors.New("fail to get value from leveldb")
 
-
 type History []store.SerializedEvent
 
 //Leveldb store implementing store interface
@@ -123,4 +122,8 @@ func (s Store) getHistory(aggregateID string) (*History, error) {
 	}
 
 	return history, nil
+}
+
+func (s Store) Close() {
+	s.db.Close()
 }

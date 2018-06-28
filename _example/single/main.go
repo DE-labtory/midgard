@@ -9,6 +9,7 @@ import (
 
 	"github.com/it-chain/midgard"
 	"github.com/it-chain/midgard/bus/rabbitmq"
+	"github.com/it-chain/midgard/store"
 	"github.com/it-chain/midgard/store/leveldb"
 )
 
@@ -66,7 +67,7 @@ func main() {
 	path := "test"
 
 	c := rabbitmq.Connect("")
-	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserCreatedEvent{}))
+	store := leveldb.NewEventStore(path, store.NewSerializer(UserCreatedEvent{}))
 	r := midgard.NewRepo(store, c)
 
 	defer os.RemoveAll(path)

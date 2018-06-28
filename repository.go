@@ -10,6 +10,7 @@ var ErrNilAggregate = errors.New("aggregate is nil")
 type EventRepository interface {
 	Load(aggregate Aggregate, aggregateID string) error
 	Save(aggregateID string, events ...Event) error
+	Close()
 }
 
 type EventPublisher interface {
@@ -88,4 +89,8 @@ func (r *Repository) Save(aggregateID string, events ...Event) error {
 	}
 
 	return nil
+}
+
+func (r *Repository) Close() {
+	r.store.Close()
 }

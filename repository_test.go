@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/it-chain/midgard"
+	"github.com/it-chain/midgard/store"
 	"github.com/it-chain/midgard/store/leveldb"
 	"github.com/stretchr/testify/assert"
 )
@@ -52,7 +53,7 @@ func TestNewRepository(t *testing.T) {
 	path := "test"
 	defer os.RemoveAll(path)
 
-	store := leveldb.NewEventStore(path, leveldb.NewSerializer(UserCreated{}, UserUpdated{}))
+	store := leveldb.NewEventStore(path, store.NewSerializer(UserCreated{}, UserUpdated{}))
 	r := midgard.NewRepo(store, nil)
 
 	aggregateID := "123"

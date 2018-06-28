@@ -1,14 +1,14 @@
 package store
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
-	"encoding/json"
-	"github.com/it-chain/midgard"
 	"strings"
-	"errors"
-)
 
+	"github.com/it-chain/midgard"
+)
 
 type SerializedEvent struct {
 	Type string
@@ -21,6 +21,9 @@ type EventSerializer interface {
 
 	// UnmarshalEvent converts an Event backed into a Record
 	Unmarshal(serializedEvent SerializedEvent) (midgard.Event, error)
+
+	// RegisterEvent
+	Register(events ...midgard.Event)
 }
 
 type JSONSerializer struct {

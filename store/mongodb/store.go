@@ -134,3 +134,7 @@ func (s Store) getDocument(aggregateID string) (*Document, error) {
 func (s Store) getFreshSession() *mgo.Session {
 	return s.Session.Copy()
 }
+
+func (s Store) Close() {
+	s.Session.Close()
+}

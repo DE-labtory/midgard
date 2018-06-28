@@ -23,7 +23,6 @@ func TestNewEventStore(t *testing.T) {
 	dbname := "test"
 
 	defer dropDB(path, dbname)
-
 	// When
 	store, err := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
 
