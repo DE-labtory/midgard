@@ -3,8 +3,6 @@ package event_store
 import (
 	"sync"
 
-	"log"
-
 	"github.com/it-chain/midgard"
 	"github.com/it-chain/midgard/store"
 	"github.com/it-chain/midgard/store/mongodb"
@@ -29,7 +27,7 @@ func InitMongoEventStore(url string, dbname string, publisher midgard.EventPubli
 		store, err := mongodb.NewEventStore(url, dbname, instance.serializer)
 
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 
 		r := midgard.NewRepo(store, publisher)
