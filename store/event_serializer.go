@@ -77,6 +77,7 @@ func (j *JSONSerializer) Unmarshal(serializedEvent SerializedEvent) (midgard.Eve
 	v := reflect.New(t).Interface()
 
 	err := json.Unmarshal(serializedEvent.Data, v)
+
 	if err != nil {
 		return nil, err
 	}
