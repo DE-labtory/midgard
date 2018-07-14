@@ -69,7 +69,9 @@ func TestStore_Save(t *testing.T) {
 	}
 
 	// When
-	saveErr := store.SaveAndCommit(aggregateID, ToEvent(events...)...)
+	store.TxBegin()
+	saveErr := store.Save(aggregateID, ToEvent(events...)...)
+	store.Commit()
 
 	// Then
 	assert.Equal(t, nil, saveErr)
@@ -86,7 +88,10 @@ func TestStore_Save(t *testing.T) {
 		{Name: "jun", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 2}},
 		{Name: "jun2", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 2}},
 	}
-	saveErr2 := store.SaveAndCommit(aggregateID, ToEvent(events2...)...)
+
+	store.TxBegin()
+	saveErr2 := store.Save(aggregateID, ToEvent(events2...)...)
+	store.Commit()
 
 	// Then
 	assert.Equal(t, nil, saveErr2)
@@ -148,6 +153,32 @@ func TestStore_Load_NoMatchingDocument(t *testing.T) {
 	_, err = store.Load(aggregateID)
 	// Then
 	assert.Equal(t, errors.New("not found"), err)
+}
+
+func TestMultiDoc_Save(t *testing.T) {
+
+	// given
+	path := "mongodb://localhost:27017"
+	dbname := "test"
+
+	defer dropDB(path, dbname)
+
+	store, err := NewEventStore(path, dbname, store.NewSerializer(UserAddedEvent{}))
+	assert.NoError(t, err)
+
+	var aggregateID string
+	aggregateID = "1"
+
+	store.TxBegin()
+
+	events := []UserAddedEvent{
+		{Name: "zf1", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "zf2", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+		{Name: "zf3", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 1}},
+	}
+
+	// When
+	store.Save(aggregateID, ToEvent(events...)...)
 }
 
 func dropDB(path string, dbname string) {

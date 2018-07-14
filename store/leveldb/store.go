@@ -23,12 +23,12 @@ type Store struct {
 	serializer store.EventSerializer
 }
 
-func NewEventStore(path string, serializer store.EventSerializer) midgard.EventStore {
+func NewEventStore(path string, serializer store.EventSerializer) Store {
 
 	db := leveldbwrapper.CreateNewDB(path)
 	db.Open()
 
-	return &Store{
+	return Store{
 		db:         db,
 		mux:        &sync.RWMutex{},
 		serializer: serializer,

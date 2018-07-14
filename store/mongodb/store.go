@@ -144,6 +144,7 @@ func (s *Store) insert(session *mgo.Session, aggregateID string, events ...midga
 func (s *Store) update(document *Document, session *mgo.Session, aggregateID string, events ...midgard.Event) (txn.Op, error) {
 
 	for _, event := range events {
+
 		serializedEvent, err := s.serializer.Marshal(event)
 		if err != nil {
 			return txn.Op{}, err
@@ -166,6 +167,8 @@ func (s *Store) Save(aggregateID string, events ...midgard.Event) error {
 	if ok {
 		storedEvents = append(storedEvents, events...)
 		s.txEvents[aggregateID] = storedEvents
+
+		return nil
 	}
 
 	s.txEvents[aggregateID] = events

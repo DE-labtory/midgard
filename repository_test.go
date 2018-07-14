@@ -58,7 +58,7 @@ func TestNewRepository(t *testing.T) {
 
 	aggregateID := "123"
 
-	err := r.Save(aggregateID, UserCreated{
+	err := r.SaveAndCommit(aggregateID, UserCreated{
 		EventModel: midgard.EventModel{
 			ID:   aggregateID,
 			Type: "User",
@@ -67,7 +67,7 @@ func TestNewRepository(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	err = r.Save(aggregateID, UserUpdated{
+	err = r.SaveAndCommit(aggregateID, UserUpdated{
 		EventModel: midgard.EventModel{
 			ID:   aggregateID,
 			Type: "User",
@@ -77,7 +77,7 @@ func TestNewRepository(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	err = r.Save(aggregateID, UserUpdated{
+	err = r.SaveAndCommit(aggregateID, UserUpdated{
 		EventModel: midgard.EventModel{
 			ID:   aggregateID,
 			Type: "User",
