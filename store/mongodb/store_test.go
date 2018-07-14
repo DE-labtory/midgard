@@ -69,7 +69,7 @@ func TestStore_Save(t *testing.T) {
 	}
 
 	// When
-	saveErr := store.Save(aggregateID, ToEvent(events...)...)
+	saveErr := store.SaveAndCommit(aggregateID, ToEvent(events...)...)
 
 	// Then
 	assert.Equal(t, nil, saveErr)
@@ -86,7 +86,7 @@ func TestStore_Save(t *testing.T) {
 		{Name: "jun", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 2}},
 		{Name: "jun2", EventModel: midgard.EventModel{ID: aggregateID, Time: time.Now().UTC(), Version: 2}},
 	}
-	saveErr2 := store.Save(aggregateID, ToEvent(events2...)...)
+	saveErr2 := store.SaveAndCommit(aggregateID, ToEvent(events2...)...)
 
 	// Then
 	assert.Equal(t, nil, saveErr2)

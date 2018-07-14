@@ -62,7 +62,16 @@ func (s Store) SaveAndCommit(aggregateID string, events ...midgard.Event) error 
 	return s.save(aggregateID, events...)
 }
 
-func (s Store) Commit() {
+func (s *Store) TxBegin() {
+
+	s.mux.Lock()
+
+	for key, _ := range s.txEvents {
+		delete(s.txEvents, key)
+	}
+}
+
+func (s *Store) Commit() error {
 
 	session := s.getFreshSession()
 
@@ -74,7 +83,11 @@ func (s Store) Commit() {
 
 	for id, events := range s.txEvents {
 
-		txnOp := createTxnOp(id, events)
+		txnOp, err := s.createTxnOp(id, events...)
+
+		if err != nil {
+			return err
+		}
 
 		txns = append(txns, txnOp)
 	}
@@ -84,19 +97,85 @@ func (s Store) Commit() {
 
 	runner := txn.NewRunner(c)
 
-	return runner.Run()
+	return runner.Run(txns, "", nil)
 }
 
-func (s *Store) createTxnOp() {
+func (s *Store) createTxnOp(aggregateID string, events ...midgard.Event) (txn.Op, error) {
 
+	session := s.getFreshSession()
+	defer session.Close()
+
+	document, err := s.getDocument(aggregateID)
+
+	if err == mgo.ErrNotFound {
+		return s.insert(session, aggregateID, events...)
+	}
+
+	if err != nil {
+		return txn.Op{}, err
+	}
+
+	return s.update(document, session, aggregateID, events...)
+}
+
+func (s *Store) insert(session *mgo.Session, aggregateID string, events ...midgard.Event) (txn.Op, error) {
+
+	document := &Document{
+		AggregateID: aggregateID,
+		History:     []store.SerializedEvent{},
+	}
+
+	for _, event := range events {
+		serializedEvent, err := s.serializer.Marshal(event)
+		if err != nil {
+			return txn.Op{}, err
+		}
+		document.appendEvent(serializedEvent)
+	}
+
+	return txn.Op{
+		C:      "events",
+		Id:     aggregateID,
+		Assert: txn.DocMissing,
+		Insert: document,
+	}, nil
+}
+
+func (s *Store) update(document *Document, session *mgo.Session, aggregateID string, events ...midgard.Event) (txn.Op, error) {
+
+	for _, event := range events {
+		serializedEvent, err := s.serializer.Marshal(event)
+		if err != nil {
+			return txn.Op{}, err
+		}
+		document.appendEvent(serializedEvent)
+	}
+
+	return txn.Op{
+		C:      "events",
+		Id:     aggregateID,
+		Assert: txn.DocExists,
+		Update: bson.M{"$set": document},
+	}, nil
 }
 
 func (s *Store) Save(aggregateID string, events ...midgard.Event) error {
 
+	storedEvents, ok := s.txEvents[aggregateID]
+
+	if ok {
+		storedEvents = append(storedEvents, events...)
+		s.txEvents[aggregateID] = storedEvents
+	}
+
+	s.txEvents[aggregateID] = events
+
+	return nil
 }
 
 //Save Events to mongodb
 func (s Store) save(aggregateID string, events ...midgard.Event) error {
+
 	s.mux.Lock()
 	session := s.getFreshSession()
 
@@ -131,6 +210,7 @@ func (s Store) save(aggregateID string, events ...midgard.Event) error {
 
 //Load Aggregate Event from leveldb
 func (s Store) Load(aggregateID string) ([]midgard.Event, error) {
+
 	s.mux.Lock()
 	session := s.getFreshSession()
 
@@ -161,6 +241,7 @@ func (s Store) Load(aggregateID string) ([]midgard.Event, error) {
 }
 
 func (s Store) getDocument(aggregateID string) (*Document, error) {
+
 	var document = Document{}
 
 	c := s.Session.DB(s.name).C("events")
