@@ -7,6 +7,7 @@ import (
 	"github.com/it-chain/midgard/store"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"gopkg.in/mgo.v2/txn"
 )
 
 type History []store.SerializedEvent
@@ -30,9 +31,11 @@ type Store struct {
 	*mgo.Session
 	mgo.Index
 	serializer store.EventSerializer
+	txEvents   map[string][]midgard.Event
 }
 
-func NewEventStore(url string, db string, serializer store.EventSerializer) (midgard.EventStore, error) {
+func NewEventStore(url string, db string, serializer store.EventSerializer) (*Store, error) {
+
 	s, err := mgo.Dial(url)
 
 	if err != nil {
@@ -44,6 +47,7 @@ func NewEventStore(url string, db string, serializer store.EventSerializer) (mid
 		mux:        &sync.RWMutex{},
 		Session:    s,
 		serializer: serializer,
+		txEvents:   make(map[string][]midgard.Event, 0),
 		Index: mgo.Index{
 			Key:    []string{"aggregate_id"},
 			Unique: true, // Prevent two documents from having the same index key
@@ -52,11 +56,47 @@ func NewEventStore(url string, db string, serializer store.EventSerializer) (mid
 			Sparse:     true, // Only index documents containing the Key fields
 		},
 	}, nil
+}
+
+func (s Store) SaveAndCommit(aggregateID string, events ...midgard.Event) error {
+	return s.save(aggregateID, events...)
+}
+
+func (s Store) Commit() {
+
+	session := s.getFreshSession()
+
+	defer func() {
+		s.mux.Unlock()
+	}()
+
+	txns := make([]txn.Op, 0)
+
+	for id, events := range s.txEvents {
+
+		txnOp := createTxnOp(id, events)
+
+		txns = append(txns, txnOp)
+	}
+
+	c := session.DB(s.name).C("events")
+	c.EnsureIndex(s.Index)
+
+	runner := txn.NewRunner(c)
+
+	return runner.Run()
+}
+
+func (s *Store) createTxnOp() {
+
+}
+
+func (s *Store) Save(aggregateID string, events ...midgard.Event) error {
 
 }
 
 //Save Events to mongodb
-func (s Store) Save(aggregateID string, events ...midgard.Event) error {
+func (s Store) save(aggregateID string, events ...midgard.Event) error {
 	s.mux.Lock()
 	session := s.getFreshSession()
 
