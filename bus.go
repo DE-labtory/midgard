@@ -6,9 +6,9 @@ type Bus interface {
 }
 
 type Publisher interface {
-	Publish(exchange string, topic string, data interface{}) (err error)
+	Publish(topic string, data interface{}) (err error)
 }
 
 type Subscriber interface {
-	Subscribe(exchange string, topic string, source interface{}) error
+	Subscribe(topic string, source interface{}) error
 }

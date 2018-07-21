@@ -81,7 +81,7 @@ func (r *Repository) Save(aggregateID string, events ...Event) error {
 
 		for _, event := range events {
 			//Todo type implicit problem
-			err := r.publisher.Publish("Event", event.GetType(), event)
+			err := r.publisher.Publish(event.GetType(), event)
 			if err != nil {
 				return errors.New("need roll back")
 			}
